@@ -2307,7 +2307,8 @@
 
 
 
-import { getUserDetailsById , getUserAccessForProject  } from "../api"; 
+import { getUserDetailsById , getUserAccessForProject, getProjectsByOrgOwnership,        // 🔸 new
+  setActiveProjectId as persistActiveProjectId  } from "../api"; 
 import React, { useEffect, useRef, useState } from "react";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { ensureSlash } from "../utils/http";
@@ -2647,61 +2648,161 @@ const getStageInfo = (projectId, roleCode) => {
       }));
     }
   };
-
-
-  useEffect(() => {
+useEffect(() => {
+  const init = async () => {
+    // 1) USER_DATA load karo
     const userString = localStorage.getItem("USER_DATA");
+    let parsedUser = null;
+
     if (userString && userString !== "undefined") {
-      const parsed = JSON.parse(userString);
-      const uid = String(parsed.user_id || parsed.id || "");
+      parsedUser = JSON.parse(userString);
+      const uid = String(parsedUser.user_id || parsedUser.id || "");
       const urlFromCache = uid && localStorage.getItem(AVATAR_URL_KEY(uid));
       const b64FromCache = uid && localStorage.getItem(AVATAR_B64_KEY(uid));
-      const serverUrl = parsed?.profile_image || parsed?.photo || "";
+      const serverUrl = parsedUser?.profile_image || parsedUser?.photo || "";
       const chosen = urlFromCache || serverUrl || b64FromCache || null;
       const merged = chosen
-        ? { ...parsed, profile_image: chosen, photo: chosen }
-        : parsed;
+        ? { ...parsedUser, profile_image: chosen, photo: chosen }
+        : parsedUser;
 
       setUserData(merged);
       fetchOrganizationDetails(merged);
+      parsedUser = merged;
     }
 
+    // 2) ACCESSES localStorage se padho (maker/checker users ke liye)
+    let parsedAccesses = [];
     const accessString = localStorage.getItem("ACCESSES");
     if (accessString && accessString !== "undefined") {
       try {
-        const parsedAccesses = JSON.parse(accessString);
-        setAccesses(parsedAccesses);
-
-        // 🔹 Initial active project decide karo
-        let initialPid = null;
-        try {
-          const qs = new URLSearchParams(window.location.search);
-          const q = qs.get("project_id");
-          if (q) initialPid = Number(q);
-        } catch {}
-
-        if (!initialPid) {
-          const ls =
-            localStorage.getItem("ACTIVE_PROJECT_ID") ||
-            localStorage.getItem("PROJECT_ID");
-          if (ls) initialPid = Number(ls);
-        }
-
-        if (!initialPid && parsedAccesses && parsedAccesses[0]?.project_id) {
-          initialPid = Number(parsedAccesses[0].project_id);
-        }
-
-        if (initialPid) {
-          setActiveProjectId(initialPid);
-          setPendingProjectId(initialPid);
-        }
+        parsedAccesses = JSON.parse(accessString) || [];
       } catch {
-        setAccesses([]);
+        parsedAccesses = [];
       }
     }
 
+    // 3) Agar MANAGER hai, ACCESSES khaali hai, aur org id hai =>
+    //    /projects/projects/by_ownership/?organization_id=XXX se projects lao
+    if (
+      parsedUser &&
+      parsedUser.is_manager &&                       // 🔥 manager check
+      (!parsedAccesses || !parsedAccesses.length) && // koi access nahi
+      (parsedUser.org || parsedUser.organization_id) // org id available
+    ) {
+      try {
+        const orgId = parsedUser.org || parsedUser.organization_id;
+        const res = await getProjectsByOrgOwnership(orgId);
+        const projects = Array.isArray(res.data) ? res.data : [];
+
+        // normalize into access-like objects
+        parsedAccesses = projects.map((p) => ({
+          project_id: p.id,
+          project_name: p.name,
+          roles: ["Manager"], // optional – just for display
+        }));
+
+        // optionally store in localStorage so other pages can reuse
+        if (parsedAccesses.length) {
+          localStorage.setItem("ACCESSES", JSON.stringify(parsedAccesses));
+        }
+      } catch (err) {
+        console.error("Failed to load manager projects via by_ownership", err);
+      }
+    }
+
+    // 4) state update karo
+    setAccesses(parsedAccesses);
+
+    // 5) Initial ACTIVE_PROJECT_ID decide karo
+    let initialPid = null;
+
+    // 5a) URL ?project_id
+    try {
+      const qs = new URLSearchParams(window.location.search);
+      const q = qs.get("project_id");
+      if (q) initialPid = Number(q);
+    } catch {}
+
+    // 5b) LocalStorage ACTIVE_PROJECT_ID / PROJECT_ID
+    if (!initialPid) {
+      const ls =
+        localStorage.getItem("ACTIVE_PROJECT_ID") ||
+        localStorage.getItem("PROJECT_ID");
+      if (ls) initialPid = Number(ls);
+    }
+
+    // 5c) Agar phir bhi nahi mila, to first project from accesses
+    if (!initialPid && parsedAccesses && parsedAccesses[0]?.project_id) {
+      initialPid = Number(parsedAccesses[0].project_id);
+    }
+
+    // 6) Final: state + localStorage dono main set karo
+    if (initialPid) {
+      setActiveProjectId(initialPid);
+      setPendingProjectId(initialPid);
+      persistActiveProjectId(initialPid); // writes ACTIVE_PROJECT_ID
+    }
+
     setHydrated(true);
-  }, []);
+  };
+
+  init();
+}, []);
+
+
+  // useEffect(() => {
+  //   const userString = localStorage.getItem("USER_DATA");
+  //   if (userString && userString !== "undefined") {
+  //     const parsed = JSON.parse(userString);
+  //     const uid = String(parsed.user_id || parsed.id || "");
+  //     const urlFromCache = uid && localStorage.getItem(AVATAR_URL_KEY(uid));
+  //     const b64FromCache = uid && localStorage.getItem(AVATAR_B64_KEY(uid));
+  //     const serverUrl = parsed?.profile_image || parsed?.photo || "";
+  //     const chosen = urlFromCache || serverUrl || b64FromCache || null;
+  //     const merged = chosen
+  //       ? { ...parsed, profile_image: chosen, photo: chosen }
+  //       : parsed;
+
+  //     setUserData(merged);
+  //     fetchOrganizationDetails(merged);
+  //   }
+
+  //   const accessString = localStorage.getItem("ACCESSES");
+  //   if (accessString && accessString !== "undefined") {
+  //     try {
+  //       const parsedAccesses = JSON.parse(accessString);
+  //       setAccesses(parsedAccesses);
+
+  //       // 🔹 Initial active project decide karo
+  //       let initialPid = null;
+  //       try {
+  //         const qs = new URLSearchParams(window.location.search);
+  //         const q = qs.get("project_id");
+  //         if (q) initialPid = Number(q);
+  //       } catch {}
+
+  //       if (!initialPid) {
+  //         const ls =
+  //           localStorage.getItem("ACTIVE_PROJECT_ID") ||
+  //           localStorage.getItem("PROJECT_ID");
+  //         if (ls) initialPid = Number(ls);
+  //       }
+
+  //       if (!initialPid && parsedAccesses && parsedAccesses[0]?.project_id) {
+  //         initialPid = Number(parsedAccesses[0].project_id);
+  //       }
+
+  //       if (initialPid) {
+  //         setActiveProjectId(initialPid);
+  //         setPendingProjectId(initialPid);
+  //       }
+  //     } catch {
+  //       setAccesses([]);
+  //     }
+  //   }
+
+  //   setHydrated(true);
+  // }, []);
 
 
 
@@ -3197,12 +3298,17 @@ const getStageInfo = (projectId, roleCode) => {
     const value = e.target.value;
     setPendingProjectId(value ? Number(value) : null);
   };
+const handleActivateProject = () => {
+  if (!pendingProjectId) return;
+  setActiveProjectId(pendingProjectId);
+  persistActiveProjectId(pendingProjectId); // single source of truth for localStorage
+};
 
-  const handleActivateProject = () => {
-    if (!pendingProjectId) return;
-    setActiveProjectId(pendingProjectId);
-    localStorage.setItem("ACTIVE_PROJECT_ID", String(pendingProjectId));
-  };
+  // const handleActivateProject = () => {
+  //   if (!pendingProjectId) return;
+  //   setActiveProjectId(pendingProjectId);
+  //   localStorage.setItem("ACTIVE_PROJECT_ID", String(pendingProjectId));
+  // };
 
   // Fetch attendance history for calendar
   const fetchAttendanceHistory = async () => {

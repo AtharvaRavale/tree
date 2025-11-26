@@ -1007,6 +1007,27 @@ export const myProjectSchedules = (project_id, extraParams = {}) =>
 
 
   // api.js
+// export const getProjectsForCurrentUser = async () => {
+//   const roleRaw = localStorage.getItem("ROLE") || "";
+//   const role = roleRaw.toLowerCase();
+//   const userStr = localStorage.getItem("USER_DATA");
+//   const user = userStr && userStr !== "undefined" ? JSON.parse(userStr) : null;
+
+//   if (!user) return { data: [] };
+//   if (!__hasAccess() || __isLoggingOut()) return { data: [] };
+
+
+//   if (role === "super admin") return Allprojects(); // /projects/
+//   if (role === "admin" || role === "manager") return getProjectUserDetails(); // /user-stage-role/get-projects-by-user/
+
+//   // fallback: ownership-based for other roles
+//   const entity_id = user.entity_id || null;
+//   const company_id = user.company_id || null;
+//   const organization_id = user.org || user.organization_id || null;
+//   if (!entity_id && !company_id && !organization_id) return { data: [] };
+//   return getProjectsByOwnership({ entity_id, company_id, organization_id }); // /projects/by_ownership/?...
+// };
+
 export const getProjectsForCurrentUser = async () => {
   const roleRaw = localStorage.getItem("ROLE") || "";
   const role = roleRaw.toLowerCase();
@@ -1016,16 +1037,20 @@ export const getProjectsForCurrentUser = async () => {
   if (!user) return { data: [] };
   if (!__hasAccess() || __isLoggingOut()) return { data: [] };
 
+  // 1) SUPER ADMIN – see all projects
+  if (role === "super admin") return Allprojects();
 
-  if (role === "super admin") return Allprojects(); // /projects/
-  if (role === "admin" || role === "manager") return getProjectUserDetails(); // /user-stage-role/get-projects-by-user/
+  // 2) ADMIN – stage-role based projects
+  if (role === "admin") return getProjectUserDetails(); // /user-stage-role/get-projects-by-user/
 
-  // fallback: ownership-based for other roles
+  // 3) MANAGER + all other roles – ownership based
   const entity_id = user.entity_id || null;
   const company_id = user.company_id || null;
   const organization_id = user.org || user.organization_id || null;
+
   if (!entity_id && !company_id && !organization_id) return { data: [] };
-  return getProjectsByOwnership({ entity_id, company_id, organization_id }); // /projects/by_ownership/?...
+
+  return getProjectsByOwnership({ entity_id, company_id, organization_id });
 };
 
 
@@ -1321,3 +1346,34 @@ export const getUserAccessForProject = (userId, projectId) =>
   export const getStagesByPhase = (phaseId) => {
   return projectInstance.get(`/stages/by_phase/${phaseId}/`);
 };
+
+
+export const getQuestionHotspots = (projectId, params = {}) =>
+  NEWchecklistInstance.get("stats/questions/", {
+    params: { project_id: projectId, ...params },
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+  export function setActiveProjectId(projectId) {
+  if (!projectId) return;
+  localStorage.setItem("ACTIVE_PROJECT_ID", String(projectId));
+}
+
+// NEW: manager projects by ownership
+export function getManagerOwnedProjects(organizationId) {
+  return axiosInstance.get(
+    "/projects/projects/by_ownership/",
+    { params: { organization_id: organizationId } }
+  );
+}
