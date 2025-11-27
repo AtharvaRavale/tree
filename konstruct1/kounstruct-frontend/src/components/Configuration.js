@@ -1303,6 +1303,9 @@ const Configuration = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [nameCache, setNameCache] = useState({});
+  const [deleteTarget, setDeleteTarget] = useState(null);   // jis project ko delete karna hai
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
 
   // THEME palette
   const ORANGE = "#ffbe63";
@@ -1433,7 +1436,43 @@ try {
     
     fetchProjects();
   }, []);
-  
+  const handleConfirmDelete = async () => {
+  if (!deleteTarget) return;
+
+  setDeleteLoading(true);
+  try {
+    // 🔥 yahi pe tumhara "delete ka process" trigger hoga
+    // Backend DRF default destroy = DELETE /projects/projects/:id/
+    await axios.delete(
+      `${API_BASE}/projects/projects/${deleteTarget.id}/`,
+      { headers: authHeaders() }
+    );
+
+    toast.success("Project deleted successfully.");
+
+    // UI se bhi hata do
+    setProjects((prev) => {
+      const updated = prev.filter((p) => p.id !== deleteTarget.id);
+      // agar activeProjectId wahi tha to usko reset
+      if (activeProjectId === deleteTarget.id) {
+        setActiveProjectId(updated[0]?.id ?? null);
+      }
+      return updated;
+    });
+
+    setDeleteTarget(null);
+  } catch (e) {
+    console.error(e);
+    toast.error(
+      e?.response?.data?.detail ||
+        e?.response?.data?.message ||
+        "Failed to delete project."
+    );
+  } finally {
+    setDeleteLoading(false);
+  }
+};
+
   // const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   // Fallback: fetch project name by id if missing
   const getProjectName = (project) => {
@@ -2057,7 +2096,10 @@ return (
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8 pb-4">
+            
+
               {projects.map((project, index) => (
+                
                 <div
                   key={project.id}
                   className="group relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 hover:scale-105 hover:-translate-y-3 transform-gpu"
@@ -2075,6 +2117,33 @@ return (
                   }}
                   onClick={() => handleProjectClick(project)}
                 >
+                   {/* ❌ Delete X – only for super admin */}
+    {isSuperAdmin && (
+      <button
+        type="button"
+        className="
+          absolute top-2 right-2 z-30
+          w-7 h-7 rounded-full
+          flex items-center justify-center
+          text-xs font-bold
+          shadow-md
+          hover:scale-105
+          transition
+        "
+        style={{
+          backgroundColor: "#ef4444",
+          color: "#fff",
+          border: "1px solid rgba(0,0,0,0.15)",
+        }}
+        title="Delete project"
+        onClick={(e) => {
+          e.stopPropagation();      // card click na chale
+          setDeleteTarget(project); // ✅ yahan project available hai
+        }}
+      >
+        ×
+      </button>
+    )}
                   {/* Role Badges */}
                   <div className="absolute top-3 left-3 z-20 flex gap-1 flex-wrap max-w-[calc(100%-80px)]">
                     {Array.isArray(project.roles) &&
@@ -2363,6 +2432,144 @@ return (
   </div>
 )}
 {/* ================= end Scheduled Modal ================= */}
+{/* =================== Delete Confirm Modal =================== */}
+{isSuperAdmin && deleteTarget && (
+  <div
+    className="fixed inset-0 z-[65] flex items-center justify-center p-4"
+    style={{ backgroundColor: "rgba(0,0,0,.6)", backdropFilter: "blur(6px)" }}
+    onClick={() => !deleteLoading && setDeleteTarget(null)}
+  >
+    <div
+      className="w-full max-w-md rounded-2xl border shadow-2xl overflow-hidden"
+      style={{ backgroundColor: cardColor, borderColor: "rgba(0,0,0,.12)" }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {/* Header */}
+      <div
+        className="px-5 py-4 border-b flex items-center justify-between"
+        style={{ borderColor: "rgba(0,0,0,.08)" }}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="w-9 h-9 rounded-full flex items-center justify-center"
+            style={{
+              backgroundColor: "rgba(239,68,68,.12)",
+              border: "1px solid rgba(239,68,68,.5)",
+            }}
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              fill="none"
+            >
+              <path
+                d="M12 9v4m0 4h.01M4.93 4.93l14.14 14.14M12 2a10 10 0 100 20 10 10 0 000-20z"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <div>
+            <div
+              className="text-base font-semibold"
+              style={{ color: textColor }}
+            >
+              Delete project?
+            </div>
+            <div
+              className="text-xs opacity-70"
+              style={{ color: textColor }}
+            >
+              This action cannot be undone. The delete process will run for this project.
+            </div>
+          </div>
+        </div>
+
+        <button
+          className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-black/5"
+          onClick={() => !deleteLoading && setDeleteTarget(null)}
+        >
+          <svg
+            className="w-4 h-4"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            fill="none"
+          >
+            <path
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+
+      {/* Body */}
+      <div className="px-5 py-5 space-y-4">
+        <div className="text-sm" style={{ color: textColor }}>
+          Are you sure you want to delete{" "}
+          <span className="font-semibold">
+            {getProjectName(deleteTarget)}
+          </span>{" "}
+          ?
+        </div>
+
+        <div className="flex items-center justify-end gap-3 pt-2">
+          <button
+            type="button"
+            className="px-4 py-2 rounded-lg text-sm font-semibold border hover:bg-black/5 disabled:opacity-60"
+            style={{ borderColor: "rgba(0,0,0,.12)" }}
+            disabled={deleteLoading}
+            onClick={() => setDeleteTarget(null)}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: "#ef4444",
+              color: "#fff",
+              boxShadow: "0 4px 12px rgba(239,68,68,.4)",
+            }}
+            disabled={deleteLoading}
+            onClick={handleConfirmDelete}
+          >
+            {deleteLoading ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Deleting...
+              </>
+            ) : (
+              <>
+                <svg
+                  className="w-4 h-4"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  fill="none"
+                >
+                  <path
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-3h4m-6 3h8"
+                  />
+                </svg>
+                Yes, delete
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+{/* ================= end Delete Confirm Modal =================== */}
+
 
     {/* ================= FLAGS MODAL POPUP ================= */}
     {flagModalOpen && (
