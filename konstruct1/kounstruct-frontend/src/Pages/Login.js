@@ -16,8 +16,25 @@ import { setLoggingOut } from "../api/axiosInstance";
 const BG_IMAGES = [Bg1, Bg2, Bg3];
 const BG_INTERVAL = 7000;
 
+
+function deriveRolesFromToken(tokenData) {
+  if (!tokenData) return [];
+  let roles = Array.isArray(tokenData.roles) ? [...tokenData.roles] : [];
+
+  // token me aane wale watcher flags ko bhi roles me push kar do
+  if (tokenData.is_project_manager && !roles.includes("PROJECT_MANAGER")) {
+    roles.push("PROJECT_MANAGER");
+  }
+  if (tokenData.is_project_head && !roles.includes("PROJECT_HEAD")) {
+    roles.push("PROJECT_HEAD");
+  }
+
+  return roles;
+}
+
 function getDisplayRole(userData) {
   if (!userData) return "User";
+
   let allRoles = [];
   if (Array.isArray(userData.accesses)) {
     userData.accesses.forEach((access) => {
@@ -29,16 +46,57 @@ function getDisplayRole(userData) {
       }
     });
   }
+
+  // top-level priority flags
   if (userData?.superadmin || userData?.is_staff) return "Super Admin";
   if (userData?.is_client) return "Admin"; // Treat Client as Admin
+
+  // 🔴 NEW — watcher flags ko priority do
+  if (userData?.is_project_head) return "Project Head";
+  if (userData?.is_project_manager) return "Project Manager";
+
+  // normal manager
   if (userData?.is_manager) return "Manager";
+
   if (allRoles.length > 0) {
-    // Show only unique roles, comma-separated
     const uniqueRoles = [...new Set(allRoles)];
+    const upper = uniqueRoles.map((r) => String(r).toUpperCase());
+
+    // agar roles array me hi PROJECT_MANAGER/HEAD aa raha ho to bhi handle karo
+    if (upper.includes("PROJECT_HEAD")) return "Project Head";
+    if (upper.includes("PROJECT_MANAGER")) return "Project Manager";
+
     return uniqueRoles.join(", ");
   }
+
   return "User";
 }
+
+
+
+// function getDisplayRole(userData) {
+//   if (!userData) return "User";
+//   let allRoles = [];
+//   if (Array.isArray(userData.accesses)) {
+//     userData.accesses.forEach((access) => {
+//       if (Array.isArray(access.roles)) {
+//         access.roles.forEach((role) => {
+//           const roleStr = typeof role === "string" ? role : role?.role;
+//           if (roleStr) allRoles.push(roleStr);
+//         });
+//       }
+//     });
+//   }
+//   if (userData?.superadmin || userData?.is_staff) return "Super Admin";
+//   if (userData?.is_client) return "Admin"; // Treat Client as Admin
+//   if (userData?.is_manager) return "Manager";
+//   if (allRoles.length > 0) {
+//     // Show only unique roles, comma-separated
+//     const uniqueRoles = [...new Set(allRoles)];
+//     return uniqueRoles.join(", ");
+//   }
+//   return "User";
+// }
 
 function hasSecurityGuardRole(data) {
    if (!data) return false;
@@ -179,6 +237,7 @@ useEffect(() => {
 
   const tokenData = decodeJWT(token);
   if (!tokenData) return;
+const mergedRoles = deriveRolesFromToken(tokenData);
 
   // Build a user object straight from JWT (includes photo/profile_image we put in the token)
   const userFromJWT = {
@@ -191,6 +250,11 @@ useEffect(() => {
     is_client: tokenData.is_client,
     superadmin: tokenData.superadmin,
     is_manager: tokenData.is_manager,
+     // 🔴 NEW: watcher flags + project lists
+  is_project_manager: tokenData.is_project_manager,
+  is_project_head: tokenData.is_project_head,
+  project_manager_projects: tokenData.project_manager_projects || [],
+  project_head_projects: tokenData.project_head_projects || [],
     accesses: tokenData.accesses || [],
     org: tokenData.org,
     company: tokenData.company,
@@ -299,25 +363,56 @@ useEffect(() => {
         let userData = null;
         if (response.data.user) {
           userData = response.data.user;
-        } else if (tokenData) {
-          userData = {
-            id: tokenData.user_id,
-            user_id: tokenData.user_id,
-            username: tokenData.username,
-            email: tokenData.email,
-            phone_number: tokenData.phone_number,
-            has_access: tokenData.has_access,
-            is_client: tokenData.is_client,
-            superadmin: tokenData.superadmin,
-            is_manager: tokenData.is_manager,
-            org: tokenData.org,
-            company: tokenData.company,
-            entity: tokenData.entity,
-            role: tokenData.role,
-            roles: tokenData.roles,
-            accesses: tokenData.accesses,
-          };
-        }
+          } else if (tokenData) {
+  const mergedRoles = deriveRolesFromToken(tokenData);
+
+  userData = {
+    id: tokenData.user_id,
+    user_id: tokenData.user_id,
+    username: tokenData.username,
+    email: tokenData.email,
+    phone_number: tokenData.phone_number,
+    has_access: tokenData.has_access,
+    is_client: tokenData.is_client,
+    superadmin: tokenData.superadmin,
+    is_manager: tokenData.is_manager,
+
+    // 🔴 NEW watcher flags
+    is_project_manager: tokenData.is_project_manager,
+    is_project_head: tokenData.is_project_head,
+    project_manager_projects: tokenData.project_manager_projects || [],
+    project_head_projects: tokenData.project_head_projects || [],
+
+    org: tokenData.org,
+    company: tokenData.company,
+    entity: tokenData.entity,
+    role: tokenData.role,
+    roles: mergedRoles,
+    accesses: tokenData.accesses || [],
+    profile_image: tokenData.profile_image || tokenData.photo || null,
+    photo:        tokenData.profile_image || tokenData.photo || null,
+  };
+}
+
+        // } else if (tokenData) {
+        //   userData = {
+        //     id: tokenData.user_id,
+        //     user_id: tokenData.user_id,
+        //     username: tokenData.username,
+        //     email: tokenData.email,
+        //     phone_number: tokenData.phone_number,
+        //     has_access: tokenData.has_access,
+        //     is_client: tokenData.is_client,
+        //     superadmin: tokenData.superadmin,
+        //     is_manager: tokenData.is_manager,
+        //     org: tokenData.org,
+        //     company: tokenData.company,
+        //     entity: tokenData.entity,
+        //     role: tokenData.role,
+        //     roles: tokenData.roles,
+        //     accesses: tokenData.accesses,
+        //   };
+        // }
 
         // if (userData) {
         //   dispatch(setUserData(userData));
@@ -340,15 +435,44 @@ useEffect(() => {
 //   localStorage.setItem("ROLE", getDisplayRole(userData));
 // }
 // after you've set userData from API or tokenData (and after the getUserDetailsById fallback)
+// if (userData) {
+//   // ensure photo fields are present even if API payload didn’t include them
+//   if (tokenData) {
+//     const fromJWT = tokenData.profile_image || tokenData.photo || null;
+//     if (fromJWT && !userData.profile_image) userData.profile_image = fromJWT;
+//     if (fromJWT && !userData.photo)         userData.photo = fromJWT;
+//   }
+
+//   // now cache + persist + dispatch
+//   userData = await cacheAvatarForUser(userData);
+//   dispatch(setUserData(userData));
+//   localStorage.setItem("ROLE", getDisplayRole(userData));
+// }
 if (userData) {
-  // ensure photo fields are present even if API payload didn’t include them
   if (tokenData) {
+    // photo sync
     const fromJWT = tokenData.profile_image || tokenData.photo || null;
     if (fromJWT && !userData.profile_image) userData.profile_image = fromJWT;
     if (fromJWT && !userData.photo)         userData.photo = fromJWT;
+
+    // 🔴 NEW: watcher flags + roles sync from token
+    if (tokenData.is_project_manager !== undefined) {
+      userData.is_project_manager = tokenData.is_project_manager;
+      userData.project_manager_projects = tokenData.project_manager_projects || [];
+    }
+    if (tokenData.is_project_head !== undefined) {
+      userData.is_project_head = tokenData.is_project_head;
+      userData.project_head_projects = tokenData.project_head_projects || [];
+    }
+
+    const mergedRoles = deriveRolesFromToken(tokenData);
+    if (!userData.roles || !userData.roles.length) {
+      userData.roles = mergedRoles;
+    } else {
+      userData.roles = [...new Set([...(userData.roles || []), ...mergedRoles])];
+    }
   }
 
-  // now cache + persist + dispatch
   userData = await cacheAvatarForUser(userData);
   dispatch(setUserData(userData));
   localStorage.setItem("ROLE", getDisplayRole(userData));

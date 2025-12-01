@@ -129,6 +129,7 @@ import {
   Route,
   Routes,
   useLocation,
+  Navigate,
 } from "react-router-dom";
 import { SidebarProvider } from "./components/SidebarContext";
 import Layout1 from "./components/Layout1";
@@ -176,7 +177,7 @@ import Scheduling from "./components/Scheduling";
 import GuardOnboarding from "./components/GuardOnboarding";
 import GuardAttendance from "./components/GuardAttendance";
 import AttendanceProjectPage from "./components/AttendanceProjectPage";
-
+import ProjectOverview from "./components/ProjectOverview";
 
 
 // For body background
@@ -191,6 +192,41 @@ function BodyBgController() {
   }, [theme]);
   return null;
 }
+// ----------------- ROLE GUARD for Project Overview -----------------
+function ProjectOverviewGuard({ children }) {
+  // ROLE read from localStorage / USER_DATA
+  let role = localStorage.getItem("ROLE") || "";
+
+  if (!role) {
+    try {
+      const raw = localStorage.getItem("USER_DATA");
+      if (raw) {
+        const data = JSON.parse(raw);
+        role = data?.role || data?.roles?.[0] || "";
+      }
+    } catch (e) {
+      // ignore parse error
+    }
+  }
+
+  const r = (role || "").toLowerCase();
+
+  // ✅ Allowed: Project Manager / Project Head only
+  const isAllowed = [
+    "project manager",
+    "project_manager",
+    "project head",
+    "project_head",
+  ].some((k) => r.includes(k));
+
+  if (!isAllowed) {
+    // ❌ allowed nahi → config page pe bhej do
+    return <Navigate to="/config" replace />;
+  }
+
+  return children;
+}
+
 
 // Your main app routes
 function AppRoutes() {
@@ -207,6 +243,14 @@ function AppRoutes() {
   return (
     <Layout1>
       <Routes>
+         <Route
+          path="/overview/project/:id"
+          element={
+            <ProjectOverviewGuard>
+              <ProjectOverview />
+            </ProjectOverviewGuard>
+          }
+        />
         <Route path="/config" element={<Configuration />} />
         <Route path="/all-checklists" element={<AllChecklists />} />
         <Route path="/my-ongoing-checklist" element={<MyOngoingChecklist />} />

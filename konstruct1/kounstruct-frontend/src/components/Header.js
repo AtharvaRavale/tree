@@ -919,8 +919,10 @@ function Header() {
   );
   const allowuser = showHamburger; // same condition as before
   const isSecurityGuard = hasRole("security guard"); // also matches "security_guard"
-
-  // ---- theme colors
+ const isProjectManagerOrHead =
+    hasRole("Project Manager") ||
+    hasRole("Project Head") ||
+    hasRole("Head");  // ---- theme colors
   const bgColor = theme === "dark" ? "#191922" : BG_OFFWHITE;
   const cardColor = theme === "dark" ? "#23232c" : "#fff";
   const borderColor = ORANGE;
@@ -1072,7 +1074,7 @@ function Header() {
           style={{ marginLeft: "auto" }}
         >
           {/* Analytics: hidden for security guard; onClick triggers API */}
-        {!isSecurityGuard && (
+        {!isSecurityGuard && !isProjectManagerOrHead &&(
   <NavLink
     to="/analytics"
     onClick={() => {

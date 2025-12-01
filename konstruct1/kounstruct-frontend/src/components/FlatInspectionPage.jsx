@@ -4,7 +4,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTheme } from "../ThemeContext";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { checklistInstance, projectInstance } from '../api/axiosInstance';
+import { NEWchecklistInstance,checklistInstance, projectInstance } from '../api/axiosInstance';
 import { showToast } from "../utils/toast";
 import CRMHandoverForm from "./CRMHandoverForm";
 
@@ -139,7 +139,220 @@ const VERIFY_ITEM_API = "/Decsion-makeing-forSuer-Inspector/";
 
 //const MAKER_DONE_API  = "/sexy-maker/";
 const MAKER_DONE_API  = "/done-maker/";
+//new
 
+//new
+
+const ReportFilterModal = ({ onClose, onApply, themeConfig }) => {
+  const [scope, setScope] = useState("all"); // all | failed | pending
+  const [includePhotos, setIncludePhotos] = useState(true);
+  const [groupByRoom, setGroupByRoom] = useState(true);
+  const [includeMaker, setIncludeMaker] = useState(true);
+  const [includeChecker, setIncludeChecker] = useState(true);
+  const [includeSupervisor, setIncludeSupervisor] = useState(true);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onApply({
+      scope,
+      includePhotos,
+      groupByRoom,
+      includeMaker,
+      includeChecker,
+      includeSupervisor,
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+      <div
+        className="w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden"
+        style={{ background: themeConfig.cardBg, border: `1px solid ${themeConfig.border}` }}
+      >
+        {/* Header */}
+        <div
+          className="px-6 py-4 flex items-center justify-between border-b"
+          style={{ borderColor: themeConfig.border, background: themeConfig.headerBg }}
+        >
+          <h3
+            className="text-lg font-bold"
+            style={{ color: themeConfig.textPrimary }}
+          >
+            Download Inspection Report
+          </h3>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
+            style={{ background: `${themeConfig.error}20`, color: themeConfig.error }}
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Body */}
+        <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4 text-sm">
+          {/* Scope */}
+          <div>
+            <div
+              className="font-medium mb-2"
+              style={{ color: themeConfig.textPrimary }}
+            >
+              Scope of Report
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { key: "all", label: "All Items" },
+                { key: "failed", label: "Only Failed" },
+                { key: "pending", label: "Only Pending" },
+              ].map((opt) => (
+                <button
+                  key={opt.key}
+                  type="button"
+                  onClick={() => setScope(opt.key)}
+                  className={`px-3 py-2 rounded-lg text-xs font-medium border transition-all ${
+                    scope === opt.key ? "shadow-md" : ""
+                  }`}
+                  style={{
+                    background:
+                      scope === opt.key
+                        ? `linear-gradient(135deg, ${themeConfig.accent}, ${themeConfig.accent}dd)`
+                        : `${themeConfig.accent}10`,
+                    color: scope === opt.key ? "white" : themeConfig.accent,
+                    borderColor:
+                      scope === opt.key ? themeConfig.accent : `${themeConfig.border}`,
+                  }}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Toggles */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label className="flex items-start gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={includePhotos}
+                onChange={(e) => setIncludePhotos(e.target.checked)}
+                className="mt-1 w-4 h-4"
+              />
+              <span>
+                <div
+                  className="font-medium"
+                  style={{ color: themeConfig.textPrimary }}
+                >
+                  Include Photos
+                </div>
+                <div
+                  className="text-xs"
+                  style={{ color: themeConfig.textSecondary }}
+                >
+                  Attach images captured during inspection.
+                </div>
+              </span>
+            </label>
+
+            <label className="flex items-start gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={groupByRoom}
+                onChange={(e) => setGroupByRoom(e.target.checked)}
+                className="mt-1 w-4 h-4"
+              />
+              <span>
+                <div
+                  className="font-medium"
+                  style={{ color: themeConfig.textPrimary }}
+                >
+                  Group by Room
+                </div>
+                <div
+                  className="text-xs"
+                  style={{ color: themeConfig.textSecondary }}
+                >
+                  Organise questions section-wise (Living, Bedroom, etc.).
+                </div>
+              </span>
+            </label>
+          </div>
+
+          {/* Roles */}
+          <div>
+            <div
+              className="font-medium mb-2"
+              style={{ color: themeConfig.textPrimary }}
+            >
+              Include Remarks From
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={includeMaker}
+                  onChange={(e) => setIncludeMaker(e.target.checked)}
+                  className="w-4 h-4"
+                />
+                <span className="text-xs" style={{ color: themeConfig.textPrimary }}>
+                  MAKER
+                </span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={includeChecker}
+                  onChange={(e) => setIncludeChecker(e.target.checked)}
+                  className="w-4 h-4"
+                />
+                <span className="text-xs" style={{ color: themeConfig.textPrimary }}>
+                  CHECKER
+                </span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={includeSupervisor}
+                  onChange={(e) => setIncludeSupervisor(e.target.checked)}
+                  className="w-4 h-4"
+                />
+                <span className="text-xs" style={{ color: themeConfig.textPrimary }}>
+                  SUPERVISOR
+                </span>
+              </label>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="pt-4 flex items-center justify-end gap-3 border-t" style={{ borderColor: themeConfig.border }}>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-lg text-sm font-medium"
+              style={{
+                background: themeConfig.textSecondary,
+                color: "white",
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-5 py-2 rounded-lg text-sm font-medium shadow-md hover:shadow-lg transition-all"
+              style={{
+                background: `linear-gradient(135deg, ${themeConfig.accent}, ${themeConfig.accent}dd)`,
+                color: "white",
+                border: `2px solid ${themeConfig.accent}`,
+              }}
+            >
+              Generate Report
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+export const FLAT_REPORT_API = "/flat-report/";
 
 
 
@@ -149,6 +362,10 @@ const FlatInspectionPage = () => {
     const navigate = useNavigate();
     const { flatId } = useParams();
 
+// const [reportData, setReportData] = useState(null);
+// const [reportLoading, setReportLoading] = useState(false);
+// const [reportError, setReportError] = useState(null);
+// const [showReportFilter, setShowReportFilter] = useState(false);
     // Get data from navigation state
     const { projectId, flatNumber, flatType } = location.state || {};
 
@@ -167,6 +384,25 @@ const FlatInspectionPage = () => {
         next: null,
         previous: null
     });
+    const [showOverviewFilter, setShowOverviewFilter] = useState(false);
+const [lastOverviewFilters, setLastOverviewFilters] = useState(null);
+
+
+
+
+    
+// ---- Report filter helpers ----
+const [categoryOptions, setCategoryOptions] = useState([]);
+  const [category, setCategory] = useState("");
+
+const [stageOptions, setStageOptions] = useState([]);
+const [stagesLoading, setStagesLoading] = useState(false);
+const [stageInfo, setStageInfo] = useState(null);
+const [stageInfoLoading, setStageInfoLoading] = useState(false);
+const [stageInfoError, setStageInfoError] = useState(null);
+const [lastReportFilters, setLastReportFilters] = useState(null);
+const [projectCategories, setProjectCategories] = useState([]); // 👈 NEW
+
 
 
     const flowRole = localStorage.getItem("FLOW_ROLE"); // "CHECKER" / "MAKER" / "SUPERVISOR"
@@ -241,6 +477,18 @@ const resolveApiRoleId = (explicitRole) => {
     const [reportData, setReportData] = useState(null);
     const [reportLoading, setReportLoading] = useState(false);
     const [reportError, setReportError] = useState(null);
+    // 🔽 Report filter popup state
+const [showReportFilter, setShowReportFilter] = useState(false);
+
+const [reportFilter, setReportFilter] = useState({
+  scope: "all",            // "all" | "failed" | "pending"
+  includePhotos: false,
+  groupByRoom: true,
+  includeMaker: true,
+  includeChecker: true,
+  includeSupervisor: true,
+});
+
 
     const [activeTab, setActiveTab] = useState('ready-to-start');
     const [tabData, setTabData] = useState({
@@ -736,6 +984,22 @@ const statusByTab = {
             setTabLoading(prev => ({ ...prev, [tabKey]: false }));
         }
     };
+// filters: tumhare modal ka state
+// function buildReportQuery(filters = {}) {
+//   const params = new URLSearchParams();
+
+//   if (filters.fromDate) params.append("from_date", filters.fromDate);      // "YYYY-MM-DD"
+//   if (filters.toDate) params.append("to_date", filters.toDate);            // "YYYY-MM-DD"
+//   if (filters.decisionRole) params.append("decision_role", filters.decisionRole); // maker/supervisor/checker
+//   if (filters.outcome) params.append("outcome", filters.outcome);          // pass/fail/rework/pending
+//   if (filters.withPhotos) params.append("with_photos", "true");
+
+//   // NEW: stage + category
+//   if (filters.stageId) params.append("stage_id", filters.stageId);
+//   if (filters.category) params.append("category", filters.category);
+
+//   return params.toString();
+// }
 
     // Handle tab switching with on-demand loading
     // const handleTabSwitch = async (tabKey) => {
@@ -788,37 +1052,317 @@ const statusByTab = {
     console.log(" before useEffect triggered!", flatId);
     const token = localStorage.getItem("ACCESS_TOKEN");
     // const isMaker = userRole === "MAKER";
-
-
 useEffect(() => {
-    console.log("useEffect triggered!", flatId);
+  console.log("useEffect triggered!", flatId);
+  if (!flatId) return;
 
-    if (!flatId) return;
+  const token = localStorage.getItem("ACCESS_TOKEN");
+  if (!token) {
+    console.warn("No token, cannot preload report meta");
+    return;
+  }
 
-    console.log("Fetching report for FlatId:", flatId);
+  console.log("Preloading report meta for FlatId:", flatId);
 
-   fetch(`https://konstruct.world/checklists/flat-report/${flatId}/`, {
-    headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
+  (async () => {
+    try {
+      const res = await NEWchecklistInstance.get(
+        `/flat-report/${flatId}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          timeout: 60000,
+        }
+      );
+
+      const data = res.data || {};
+      console.log("📄 Report Data (preload):", data);
+      setReportData(data);
+
+      // ---------- STAGES ----------
+      const stagesArr = Array.isArray(data.stages) ? data.stages : [];
+      const stageList = stagesArr
+        .filter((s) => s.stage_id && s.stage_name)
+        .map((s) => ({
+          id: s.stage_id,
+          name: s.stage_name,
+        }));
+
+      console.log("🟢 stageOptions from flat-report:", stageList);
+      setStageOptions(stageList);
+
+      // ---------- CATEGORIES (deep scan) ----------
+      const catSet = new Set();
+
+      const collectCategories = (node) => {
+        if (!node || typeof node !== "object") return;
+
+        // Possible keys jinke andar category ka naam ho sakta hai
+        const v1 = node.category;
+        const v2 = node.category_name;
+        const v3 = node.category_label;
+        const v4 = node.category_slug;
+
+        [v1, v2, v3, v4].forEach((val) => {
+          if (typeof val === "string" && val.trim()) {
+            catSet.add(val.trim());
+          }
+        });
+
+        // Recursively andar jao
+        Object.values(node).forEach((val) => {
+          if (Array.isArray(val)) {
+            val.forEach(collectCategories);
+          } else if (val && typeof val === "object") {
+            collectCategories(val);
+          }
+        });
+      };
+
+      // Sirf stages array se scan karna enough hai
+      collectCategories(stagesArr);
+
+      const catList = Array.from(catSet).sort((a, b) =>
+        String(a).localeCompare(String(b))
+      );
+
+      console.log("🟢 categoryOptions from flat-report:", catList);
+    //   setCategoryOptions(catList);
+    if (catList.length > 0) {
+  setCategoryOptions((prev) => {
+    const merged = new Set(prev || []);
+    catList.forEach((c) => merged.add(c));
+    return Array.from(merged).sort((a, b) =>
+      String(a).localeCompare(String(b))
+    );
+  });
+}
+    } catch (error) {
+      console.error("❌ flat-report preload failed:", error);
+      setReportError(
+        error.response?.data?.detail ||
+          error.message ||
+          "Failed to preload report"
+      );
     }
-})
-.then(res => {
-    if (!res.ok) throw new Error("Network response was not ok");
-    return res.json();   // <-- THIS is needed!
-})
-.then(data => {
-    console.log("Report Data:", data); // This will now be the JSON object
-    setReportData(data);
-})
-.catch(error => {
-    console.log("Fetch error:", error);
-    setReportError(error.message);
-});
-
+  })();
 }, [flatId]);
+// useEffect(() => {
+//   if (!userRole || !projectId) return;
+
+//   const stageMap = new Map();
+//   const categoriesSet = new Set();
+
+//   // collectFromItems(...)
+//   // collectFromChecklists(...)
+//   // INITIALIZER ke liye tabData se
+//   // CHECKER / MAKER / SUPERVISOR ke liye checklistData se
+//   // + stageInfo se stage add karo
+
+//   const newStageOptions = Array.from(stageMap.entries())
+//     .map(([id, name]) => ({ id, name }))
+//     .sort((a, b) => String(a.name).localeCompare(String(b.name)));
+
+//   const newCategoryOptions = Array.from(categoriesSet).sort((a, b) =>
+//     String(a).localeCompare(String(b))
+//   );
+
+//   console.log("🔎 Built stageOptions:", newStageOptions);
+//   console.log("🔎 Built categoryOptions:", newCategoryOptions);
+
+//   setStageOptions(newStageOptions);
+//   setCategoryOptions(newCategoryOptions);
+// }, [
+//   userRole,
+//   projectId,
+//   activeTab,
+//   activeWorkTab,
+//   tabData,
+//   checklistData,
+//   stageInfo,
+// ]);
+
+// useEffect(() => {
+//   console.log("useEffect triggered!", flatId);
+//   if (!flatId) return;
+
+//   const token = localStorage.getItem("ACCESS_TOKEN");
+//   if (!token) {
+//     console.warn("No token, cannot preload report meta");
+//     return;
+//   }
+
+//   console.log("Preloading report meta for FlatId:", flatId);
+
+//   (async () => {
+//     try {
+//       const res = await NEWchecklistInstance.get(
+//         `/flat-report/${flatId}/`,
+//         {
+//           headers: {
+//             Authorization: `Bearer ${token}`,
+//           },
+//           timeout: 60000,
+//         }
+//       );
+
+//       const data = res.data || {};
+//       console.log("📄 Report Data (preload):", data);
+//       setReportData(data);
+
+//       // 🔹 YAHI SE STAGES + CATEGORIES NIKALO
+//       if (Array.isArray(data.stages)) {
+//         const stageList = [];
+//         const catSet = new Set();
+
+//         data.stages.forEach((stage) => {
+//           // stageOptions
+//           if (stage.stage_id && stage.stage_name) {
+//             stageList.push({
+//               id: stage.stage_id,
+//               name: stage.stage_name,
+//             });
+//           }
+
+//           // categoryOptions: stage ke andar wali checklists se
+//           (stage.checklists || []).forEach((chk) => {
+//             const cat =
+//               chk.category ||
+//               chk.category_name ||
+//               chk.category_label ||
+//               chk.category_slug;
+
+//             if (cat) catSet.add(cat);
+//           });
+//         });
+
+//         console.log("✅ Built stageOptions from flat-report:", stageList);
+//         console.log(
+//           "✅ Built categoryOptions from flat-report:",
+//           Array.from(catSet)
+//         );
+
+//         setStageOptions(stageList);
+//         setCategoryOptions(Array.from(catSet));
+//       }
+//     } catch (error) {
+//       console.error("❌ flat-report preload failed:", error);
+//       setReportError(
+//         error.response?.data?.detail ||
+//           error.message ||
+//           "Failed to preload report"
+//       );
+//     }
+//   })();
+// }, [flatId]);
+
+// useEffect(() => {
+//     console.log("useEffect triggered!", flatId);
+
+//     if (!flatId) return;
+
+//     console.log("Fetching report for FlatId:", flatId);
+
+//    fetch(`https://konstruct.world/checklists/flat-report/${flatId}/`, {
+//     headers: {
+//         "Authorization": `Bearer ${token}`,
+//         "Content-Type": "application/json"
+//     }
+// })
+// .then(res => {
+//     if (!res.ok) throw new Error("Network response was not ok");
+//     return res.json();   // <-- THIS is needed!
+// })
+// .then(data => {
+//     console.log("Report Data:", data); // This will now be the JSON object
+//     setReportData(data);
+// })
+// .catch(error => {
+//     console.log("Fetch error:", error);
+//     setReportError(error.message);
+// });
+
+// }, [flatId]);
 
 console.log("Flat ID for report fetch:", flatId);
+
+// const handleGenerateReport = async (filters) => {
+//   try {
+//     setReportLoading(true);
+//     setShowReportFilter(false);
+
+//     const token = localStorage.getItem("ACCESS_TOKEN");
+
+//     // 🔧 Build query params for backend (same filters as before)
+//     const params = new URLSearchParams({
+//       scope: filters.scope,                              // all | failed | pending
+//       include_photos: filters.includePhotos ? "1" : "0",
+//       group_by_room: filters.groupByRoom ? "1" : "0",
+//       include_roles: [
+//         filters.includeMaker && "maker",
+//         filters.includeChecker && "checker",
+//         filters.includeSupervisor && "supervisor",
+//       ]
+//         .filter(Boolean)
+//         .join(","), // e.g. "maker,checker,supervisor"
+//     });
+
+//     // 🔗 Use your actual API:
+//     // https://konstruct.world/checklists/flat-report/${flatId}/
+//     const url = `https://konstruct.world/checklists/flat-report/${flatId}/?${params.toString()}`;
+
+//     const res = await fetch(url, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//         "Content-Type": "application/json",
+//       },
+//     });
+
+//     if (!res.ok) {
+//       throw new Error("Network response was not ok");
+//     }
+
+//     const data = await res.json();
+//     console.log("Filtered Report Data:", data);
+
+//     // Optional: keep in state like your useEffect
+//     setReportData(data);
+
+//     if (data?.pdf_url) {
+//       window.open(
+//         data.pdf_url.startsWith("http")
+//           ? data.pdf_url
+//           : `https://konstruct.world${data.pdf_url}`,
+//         "_blank"
+//       );
+//     } else {
+//       toast.error("Report URL not found", {
+//         style: {
+//           background: themeConfig.error,
+//           color: "white",
+//           borderRadius: "12px",
+//         },
+//       });
+//     }
+//   } catch (err) {
+//     console.error("❌ Report generation failed:", err);
+//     toast.error(
+//       err?.message ||
+//         err.response?.data?.detail ||
+//         "Failed to generate report. Please try again.",
+//       {
+//         style: {
+//           background: themeConfig.error,
+//           color: "white",
+//           borderRadius: "12px",
+//         },
+//       }
+//     );
+//   } finally {
+//     setReportLoading(false);
+//   }
+// };
 
     useEffect(() => {
         const styleElement = document.createElement('style');
@@ -1019,11 +1563,134 @@ const ImageStrip = ({ sources = [], themeConfig }) => (
 );
 
 
+// useEffect(() => {
+//   const cats = new Set();
+
+//   const collectFromItems = (items = []) => {
+//     items.forEach((item) => {
+//       const cat =
+//         item.category ||
+//         item.category_name ||
+//         item.category_label ||
+//         item.category_text ||
+//         null;
+//       if (cat) {
+//         cats.add(String(cat).trim());
+//       }
+//     });
+//   };
+
+//   if (userRole === "INITIALIZER") {
+//     // INITIALIZER → tabData[tabKey].checklists[].items
+//     Object.values(tabData || {}).forEach((roomsArray) => {
+//       (roomsArray || []).forEach((roomObj) => {
+//         (roomObj.checklists || []).forEach((cl) =>
+//           collectFromItems(cl.items || [])
+//         );
+//       });
+//     });
+//   } else {
+//     // Working roles → checklistData[].available_for_me / assigned_to_me
+//     (checklistData || []).forEach((roomObj) => {
+//       ["available_for_me", "assigned_to_me", "pending_for_me"].forEach(
+//         (key) => {
+//           (roomObj[key] || []).forEach((cl) =>
+//             collectFromItems(cl.items || [])
+//           );
+//         }
+//       );
+//     });
+//   }
+
+//   setCategoryOptions(Array.from(cats).sort());
+// }, [userRole, tabData, checklistData]);
+
+useEffect(() => {
+  const cats = new Set();
+
+  const collectFromItems = (items = []) => {
+    items.forEach((item) => {
+      const cat =
+        item.category ||
+        item.category_name ||
+        item.category_label ||
+        item.category_text ||
+        null;
+      if (cat) {
+        cats.add(String(cat).trim());
+      }
+    });
+  };
+
+  if (userRole === "INITIALIZER") {
+    // INITIALIZER → tabData[tabKey].checklists[].items
+    Object.values(tabData || {}).forEach((roomsArray) => {
+      (roomsArray || []).forEach((roomObj) => {
+        (roomObj.checklists || []).forEach((cl) =>
+          collectFromItems(cl.items || [])
+        );
+      });
+    });
+  } else {
+    // Working roles → checklistData[].available_for_me / assigned_to_me / pending_for_me
+    (checklistData || []).forEach((roomObj) => {
+      ["available_for_me", "assigned_to_me", "pending_for_me"].forEach(
+        (key) => {
+          (roomObj[key] || []).forEach((cl) =>
+            collectFromItems(cl.items || [])
+          );
+        }
+      );
+    });
+  }
+
+  // ❗ If nothing new found, don't touch categoryOptions
+  if (!cats.size) return;
+
+  // ✅ Merge new categories with whatever is already there (from flat-report)
+  setCategoryOptions((prev) => {
+    const merged = new Set(prev || []);
+    cats.forEach((c) => merged.add(c));
+    return Array.from(merged).sort();
+  });
+}, [userRole, tabData, checklistData]);
 
 
 
 
+useEffect(() => {
+  if (!projectId) return;
 
+  const token = localStorage.getItem("ACCESS_TOKEN");
+  setStagesLoading(true);
+
+  (async () => {
+    try {
+      // 🔧 Adjust endpoint if needed based on your real API
+      const res = await projectInstance.get("/stages/", {
+        params: { project_id: projectId },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const raw = res.data?.results || res.data || [];
+
+      const options = raw.map((st) => ({
+        id: st.id,
+        name:
+          st.stage_name ||
+          st.name ||
+          st.label ||
+          `Stage ${st.id}`,
+      }));
+
+      setStageOptions(options);
+    } catch (err) {
+      console.error("❌ Failed to load stages list:", err);
+    } finally {
+      setStagesLoading(false);
+    }
+  })();
+}, [projectId]);
 
 
 
@@ -1951,6 +2618,20 @@ useEffect(() => {
             setRoomsLoading(false);
         }
     };
+    const getRoomDisplayName = (roomData) => {
+  if (!roomData) return "Unknown Room";
+
+  const room = rooms.find((r) => r.id === roomData.room_id);
+
+  return (
+    room?.rooms ||                 // "Living-Dining" from API
+    room?.name ||                  // fallback if backend uses "name"
+    roomData.room_details?.rooms ||
+    roomData.room_details?.name ||
+    `Room ${roomData.room_id}`     // final fallback
+  );
+};
+
 
     useEffect(() => {
         console.log("🚀 useEffect triggered with:", { projectId, flatId });
@@ -3094,6 +3775,7 @@ if (isMaker) {
             });
           }
         }, 300);
+        
 
         return (
             <div
@@ -4497,6 +5179,139 @@ const parsePageFromUrl = (url, fallbackLimit = 10) => {
     return { limit: fallbackLimit, offset: 0, page: 1 };
   }
 };
+// useEffect(() => {
+//   if (!projectId) return;
+
+//   const fetchCategories = async () => {
+//     try {
+//       const token = localStorage.getItem("ACCESS_TOKEN");
+
+//       // If you already have projectInstance with base https://konstruct.world/projects
+//       const res = await projectInstance.get(
+//   "https://konstruct.world/projects/categories-simple",
+//   {
+//     headers: { Authorization: `Bearer ${token}` },
+//   }
+// );
+
+
+//       const all = res.data || [];
+
+//       // 🔹 Filter only current project categories
+//       const forThisProject = all.filter(
+//         (cat) => String(cat.project) === String(projectId)
+//       );
+
+//       setProjectCategories(forThisProject);
+
+//       // 🔹 Use just names in your dropdown
+//       const names = forThisProject
+//         .map((c) => c.name)
+//         .filter(Boolean)
+//         .sort((a, b) => String(a).localeCompare(String(b)));
+
+//       setCategoryOptions(names);
+//     } catch (err) {
+//       console.error("❌ Failed to load project categories:", err);
+//       // Optional: keep fallback from checklist-derived categories
+//     }
+//   };
+
+//   fetchCategories();
+// }, [projectId]);
+// useEffect(() => {
+//   if (!projectId) return;
+
+//   const fetchCategories = async () => {
+//     try {
+//       const token = localStorage.getItem("ACCESS_TOKEN");
+
+//       // ✅ NOTE: /projects/categories-simple/ (NOT /api/categories-simple/)
+//       const res = await projectInstance.get("/categories-simple/", {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       });
+
+//       const all = res.data || [];
+
+//       // 🔹 Filter by current project
+//       const forThisProject = all.filter(
+//         (cat) => String(cat.project) === String(projectId)
+//       );
+
+//       // store full objects if you want later
+//       // setProjectCategories(forThisProject);
+
+//       // 🔹 Just names for dropdown
+//       const names = forThisProject
+//         .map((c) => c.name)
+//         .filter(Boolean)
+//         .sort((a, b) => String(a).localeCompare(String(b)));
+// console.log("hello",forThisProject)
+//       setCategoryOptions(names);
+//     } catch (err) {
+//       console.error("❌ Failed to load project categories:", err);
+//     }
+//   };
+
+//   fetchCategories();
+// }, [projectId]);
+
+useEffect(() => {
+  if (!projectId) {
+    console.warn("⛔ No projectId passed to fetchCategories");
+    return;
+  }
+
+  const fetchCategories = async () => {
+    try {
+      const token = localStorage.getItem("ACCESS_TOKEN");
+
+      const res = await projectInstance.get("/categories-simple/", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        // ❓ If your backend expects project_id as query param, keep this.
+        // If not, you can remove this params block.
+        params: {
+          project_id: projectId,
+        },
+      });
+
+      console.log("🟢 RAW categories response:", res.data);
+      console.log("📌 projectId in FE:", projectId);
+
+      const all = Array.isArray(res.data)
+        ? res.data
+        : res.data.results || [];
+
+      console.log("🟢 All categories:", all);
+
+      // 🔹 Try to match both `project` and `project_id` keys
+      const forThisProject = all.filter(
+        (cat) =>
+          String(cat.project) === String(projectId) ||
+          String(cat.project_id) === String(projectId)
+      );
+
+      console.log("🟡 Filtered categories for this project:", forThisProject);
+
+      const names = forThisProject
+        .map((c) => c.name)
+        .filter(Boolean)
+        .sort((a, b) => String(a).localeCompare(String(b)));
+
+      console.log("✅ Final category names:", names);
+
+      setCategoryOptions(names);
+    } catch (err) {
+      console.error("❌ Failed to load project categories:", err);
+    }
+  };
+
+  fetchCategories();
+}, [projectId]);
 
 // const applyPageResponse = (data) => {
 //   const { next, previous, count, results } = data || {};
@@ -4874,6 +5689,424 @@ const handlePrevPage = () => {
 const handleNextPage = () => {
   if (pageState.next && !pageLoading) fetchByUrl(pageState.next);
 };
+// const handleGenerateReport = async (filters) => {
+//   setReportLoading(true);
+//   setReportError(null);
+
+//   try {
+//     const token = localStorage.getItem("ACCESS_TOKEN");
+
+//     const params = {
+//       from_date: filters.fromDate || undefined,
+//       to_date: filters.toDate || undefined,
+//       with_photos: filters.includePhotos ? "true" : "false",
+//       category: filters.category || undefined,
+//       decision_role: filters.decisionRole || undefined,
+//       outcome: filters.outcome || undefined,
+//       stage_id: filters.stageId || stageId || undefined, // fallback to derived stageId
+//     };
+
+//     const res = await NEWchecklistInstance.get(
+//       `/flat-report/${flatId}/`,
+//       {
+//         params,
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//         timeout: 60000,
+//       }
+//     );
+
+//     const data = res.data || {};
+//     setReportData(data);
+
+//     if (data.pdf_url) {
+//       const url = data.pdf_url.startsWith("http")
+//         ? data.pdf_url
+//         : `https://konstruct.world${data.pdf_url}`;
+//       window.open(url, "_blank");
+//     } else {
+//       toast.error("Report generated but pdf_url missing from response");
+//     }
+//   } catch (err) {
+//     console.error("❌ Report generation failed:", err);
+//     const msg =
+//       err.response?.data?.detail ||
+//       err.response?.data?.error ||
+//       err.message ||
+//       "Failed to generate report";
+//     setReportError(msg);
+//     toast.error(`❌ ${msg}`);
+//   } finally {
+//     setReportLoading(false);
+//     setShowReportFilter(false);
+//   }
+// };
+// const handleGenerateReport = async (filters) => {
+//   setReportLoading(true);
+//   setReportError(null);
+
+//   try {
+//     const token = localStorage.getItem("ACCESS_TOKEN");
+
+//     // 🔹 Params exactly popup ke according
+//     const params = {};
+
+//     if (filters.fromDate) params.from_date = filters.fromDate;
+//     if (filters.toDate) params.to_date = filters.toDate;
+
+//     // boolean → string (backend-friendly)
+//     params.with_photos = filters.includePhotos ? "true" : "false";
+
+//     if (filters.category) params.category = filters.category;
+//     if (filters.decisionRole) params.decision_role = filters.decisionRole;
+//     if (filters.outcome) params.outcome = filters.outcome;
+//     if (filters.stageId) params.stage_id = filters.stageId;
+
+//     // optional: agar backend yeh bhi leta ho GET me to helpful hai
+//     params.project_id = projectId;
+//     params.flat_id = flatId;
+
+//     console.log("📄 Report filters →", filters);
+//     console.log("📄 API params →", params);
+
+//     const res = await NEWchecklistInstance.get(
+//       `/flat-report/${flatId}/`,
+//       {
+//         params,
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//         timeout: 60000,
+//       }
+//     );
+
+//     const data = res.data || {};
+//     setReportData(data);
+
+//     if (data.pdf_url) {
+//       const url = data.pdf_url.startsWith("http")
+//         ? data.pdf_url
+//         : `https://konstruct.world${data.pdf_url}`;
+//       window.open(url, "_blank");
+//     } else {
+//       toast.error("Report generated but pdf_url missing from response");
+//     }
+//   } catch (err) {
+//     console.error("❌ Report generation failed:", err);
+//     const msg =
+//       err.response?.data?.detail ||
+//       err.response?.data?.error ||
+//       err.message ||
+//       "Failed to generate report";
+//     setReportError(msg);
+//     toast.error(`❌ ${msg}`);
+//   } finally {
+//     setReportLoading(false);
+//     setShowReportFilter(false);
+//   }
+// };
+const handleGenerateReport = async (filters) => {
+  setReportLoading(true);
+  setReportError(null);
+  setLastReportFilters(filters || null);
+
+  try {
+    const token = localStorage.getItem("ACCESS_TOKEN");
+
+    const params = {};
+
+    // Date range
+    if (filters.fromDate) params.from_date = filters.fromDate;
+    if (filters.toDate) params.to_date = filters.toDate;
+
+    // Only send when ON → backend treats as “only with photos”
+    if (filters.includePhotos) {
+      params.with_photos = "true";
+    }
+
+    if (filters.category) {
+      params.category = filters.category;
+    }
+
+    if (filters.decisionRole) {
+      params.decision_role = filters.decisionRole.toLowerCase();
+    }
+
+    if (filters.outcome) {
+      params.outcome = filters.outcome.toLowerCase();
+    }
+
+    if (filters.stageId) {
+      params.stage_id = filters.stageId;
+    }
+
+    console.log("📤 Report params:", params);
+
+    const res = await NEWchecklistInstance.get(`/flat-report/${flatId}/`, {
+      params,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      timeout: 60000,
+    });
+
+    const data = res.data || {};
+    setReportData(data);
+
+    // If API also returns stage/category meta, your existing effect
+    // will pick it up and rebuild stageOptions/categoryOptions.
+
+    if (data.pdf_url) {
+      const url = data.pdf_url.startsWith("http")
+        ? data.pdf_url
+        : `https://konstruct.world${data.pdf_url}`;
+      window.open(url, "_blank");
+    } else {
+      toast.error("Report generated but no PDF URL was returned.");
+    }
+  } catch (err) {
+    console.error("❌ Report generation failed:", err);
+    const msg =
+      err.response?.data?.detail ||
+      err.response?.data?.error ||
+      err.message ||
+      "Failed to generate report.";
+    setReportError(msg);
+    toast.error(`❌ ${msg}`);
+  } finally {
+    setReportLoading(false);
+    setShowReportFilter(false);
+  }
+};
+
+// const buildReportQuery = (filters = {}) => {
+//   const params = new URLSearchParams();
+
+//   if (filters.fromDate) params.set("from_date", filters.fromDate);
+//   if (filters.toDate) params.set("to_date", filters.toDate);
+
+//   if (filters.includePhotos) params.set("with_photos", "true");
+//   if (filters.category) params.set("category", filters.category);
+//   if (filters.decisionRole) params.set("decision_role", filters.decisionRole);
+//   if (filters.outcome) params.set("outcome", filters.outcome);
+//   if (filters.stageId) params.set("stage_id", String(filters.stageId));
+
+//   return params.toString();
+// };
+const buildReportQuery = (filters = {}) => {
+  const params = new URLSearchParams();
+
+  if (filters.fromDate) params.set("from_date", filters.fromDate);
+  if (filters.toDate) params.set("to_date", filters.toDate);
+
+  if (filters.includePhotos) params.set("with_photos", "true");
+  if (filters.category) params.set("category", filters.category);
+  if (filters.decisionRole) params.set("decision_role", filters.decisionRole);
+  if (filters.outcome) params.set("outcome", filters.outcome);
+  if (filters.stageId) params.set("stage_id", String(filters.stageId));
+
+  return params.toString();
+};
+const CHECKLIST_BASE = "https://konstruct.world/checklists";
+
+async function handleDownloadOverview(flatId, filters = {}, setLoading) {
+  if (!flatId) return;
+
+  try {
+    setLoading(true);
+    const token = localStorage.getItem("ACCESS_TOKEN");
+
+    const qs = buildReportQuery(filters);
+    const url = `${CHECKLIST_BASE}/flat-overview/${flatId}/${
+      qs ? `?${qs}` : ""
+    }`;
+
+    const res = await NEWchecklistInstance.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      timeout: 60000,
+    });
+
+    const data = res.data || {};
+
+    if (data.pdf_url) {
+      const pdfUrl = data.pdf_url.startsWith("http")
+        ? data.pdf_url
+        : `https://konstruct.world${data.pdf_url}`;
+      window.open(pdfUrl, "_blank");
+    } else {
+      toast.error("Overview generated but no PDF URL was returned.");
+    }
+  } catch (err) {
+    console.error("Overview download error:", err);
+    toast.error("An error occurred while generating the flat overview.");
+  } finally {
+    setLoading(false);
+  }
+}
+
+const [overviewLoading, setOverviewLoading] = useState(false);
+
+const onOverviewClick = () => {
+  // if you want “quick overview” with last filters, you can call directly:
+  // handleDownloadOverview(flatId, lastReportFilters || {}, setOverviewLoading);
+
+  // but right now you are opening a filter popup – keep that:
+  setShowOverviewFilter(true);
+};
+
+// const CHECKLIST_BASE = "https://konstruct.world/checklists";
+
+// async function handleDownloadOverview(flatId, filters, setLoading) {
+//   if (!flatId) return;
+
+//   try {
+//     setLoading(true);
+//     const token = localStorage.getItem("ACCESS_TOKEN");
+
+//     const qs = buildReportQuery(filters);
+//     const url = `${CHECKLIST_BASE}/flat-overview/${flatId}/${qs ? `?${qs}` : ""}`;
+
+//     const res = await NEWchecklistInstance.get(url, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+
+//     const data = res.data || {};
+
+//     if (data.pdf_url) {
+//       window.open(data.pdf_url, "_blank"); // ya location.href = data.pdf_url
+//     } else {
+//       toast.error("Overview PDF URL not found");
+//     }
+//   } catch (err) {
+//     console.error("Overview download error:", err);
+//     toast.error("Flat overview generate karte waqt error aaya");
+//   } finally {
+//     setLoading(false);
+//   }
+// }
+// const [overviewLoading, setOverviewLoading] = useState(false);
+
+// // ...
+// // const onOverviewClick = () => {
+// //   handleDownloadOverview(flatId, lastReportFilters || {}, setOverviewLoading);
+// // };
+// // const onOverviewClick = () => {
+// //   handleDownloadOverview(flatId, filters, setOverviewLoading);
+// // };
+// const onOverviewClick = () => {
+//   handleDownloadOverview(flatId, lastReportFilters || {}, setOverviewLoading);
+// };
+
+// const handleGenerateReport = async (filters) => {
+//   setReportLoading(true);
+//   setReportError(null);
+
+//   try {
+//     const token = localStorage.getItem("ACCESS_TOKEN");
+
+//     const params = new URLSearchParams({
+//       from_date: filters.fromDate || "",
+//       to_date: filters.toDate || "",
+//       with_photos: filters.includePhotos ? "true" : "false",
+//       category: filters.category || "",
+//       stage_id: stageId ? String(stageId) : "",
+//     });
+
+//     const url = `https://konstruct.world/checklists/flat-report/${flatId}/?${params.toString()}`;
+
+//     const res = await fetch(url, {
+//       method: "GET",
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+
+//     if (!res.ok) {
+//       throw new Error(`HTTP ${res.status}`);
+//     }
+
+//     const data = await res.json();
+//     setReportData(data);
+
+//     if (data.pdf_url) {
+//       const pdfUrl = data.pdf_url.startsWith("http")
+//         ? data.pdf_url
+//         : `https://konstruct.world${data.pdf_url}`;
+//       window.open(pdfUrl, "_blank");
+//     } else {
+//       toast.error("Report generated but pdf_url missing from response");
+//     }
+//   } catch (err) {
+//     console.error("❌ Report generation failed:", err);
+//     setReportError(err.message || "Failed to generate report");
+//     toast.error(`❌ ${err.message || "Failed to generate report"}`);
+//   } finally {
+//     setReportLoading(false);
+//     setShowReportFilter(false);
+//   }
+// };
+
+// const handleGenerateReport = async (filters) => {
+//   setReportLoading(true);
+//   setReportError(null);
+
+//   try {
+//     const token = localStorage.getItem("ACCESS_TOKEN");
+
+//     // ✅ yahan pe flat + project + filters bhejte hain
+//     const payload = {
+//       project_id: projectId,
+//       flat_id: flatId,
+//       // stage backend ko chahiye to direct bhej do
+//       stage_id: stageId || null,
+
+//       // filters from modal
+//       status: filters.status || null,           // not_started / in_progress / completed / etc
+//       category: filters.category || null,       // text / slug
+//       from_date: filters.fromDate || null,      // "YYYY-MM-DD"
+//       to_date: filters.toDate || null,          // "YYYY-MM-DD"
+//       include_photos: filters.includePhotos,    // true/false
+//     };
+
+//     const res = await NEWchecklistInstance.post(FLAT_REPORT_API, payload, {
+//   headers: {
+//     Authorization: `Bearer ${token}`,
+//     "Content-Type": "application/json",
+//   },
+//   timeout: 60000,
+// });
+
+
+//     const data = res.data || {};
+//     setReportData(data);
+
+//     if (data.pdf_url) {
+//       const url = data.pdf_url.startsWith("http")
+//         ? data.pdf_url
+//         : `https://konstruct.world${data.pdf_url}`;
+//       window.open(url, "_blank");
+//     } else {
+//       toast.error("Report generated but pdf_url missing from response");
+//     }
+//   } catch (err) {
+//     console.error("❌ Report generation failed:", err);
+//     const msg =
+//       err.response?.data?.detail ||
+//       err.response?.data?.error ||
+//       "Failed to generate report";
+//     setReportError(msg);
+//     toast.error(`❌ ${msg}`);
+//   } finally {
+//     setReportLoading(false);
+//     setShowReportFilter(false);
+//   }
+// };
+
 
 const loadFirstPage = async () => {
   setPageLoading(true);
@@ -4908,10 +6141,9 @@ const loadFirstPage = async () => {
 
 
 // after all useState declarations
-const [stageInfo, setStageInfo] = useState(null);
-const [stageInfoLoading, setStageInfoLoading] = useState(false);
-const [stageInfoError, setStageInfoError] = useState(null);
 
+// const [stageOptions, setStageOptions] = useState([]);
+// const [categoryOptions, setCategoryOptions] = useState([]);
 // 👉 clean getAnyStageId
 
 
@@ -5051,6 +6283,218 @@ useEffect(() => {
     }
   })();
 }, [stageId]);
+
+
+useEffect(() => {
+  if (!userRole || !projectId) return;
+
+  const stageMap = new Map();    // stage_id -> stage_name
+  const categoriesSet = new Set();
+
+  const collectFromItems = (items = []) => {
+    items.forEach((item) => {
+      // Category from item
+      const cat =
+        item.category ||
+        item.category_name ||
+        item.category_label ||
+        item.category_slug;
+
+      if (cat) categoriesSet.add(cat);
+
+      // Optional: stage on item
+      const sId = item.stage_id || item.stage?.id;
+      const sName = item.stage_name || item.stage?.name;
+      if (sId && sName) {
+        stageMap.set(sId, sName);
+      }
+    });
+  };
+
+  const collectFromChecklists = (checklists = []) => {
+    checklists.forEach((chk) => {
+      // Stage on checklist
+      const sId = chk.stage_id || chk.stage?.id;
+      const sName = chk.stage_name || chk.stage?.name;
+      if (sId && sName) {
+        stageMap.set(sId, sName);
+      }
+
+      // Category on checklist
+      const cat =
+        chk.category ||
+        chk.category_name ||
+        chk.category_label ||
+        chk.category_slug;
+
+      if (cat) categoriesSet.add(cat);
+
+      // Items ke andar bhi check
+      collectFromItems(chk.items || []);
+    });
+  };
+
+  // -------- INITIALIZER (tabData se) --------
+  if (userRole === "INITIALIZER") {
+    const currentTabData = tabData[activeTab] || [];
+    currentTabData.forEach((room) => {
+      collectFromChecklists(room.checklists || []);
+    });
+  }
+
+  // -------- WORKING ROLES (CHECKER / MAKER / SUPERVISOR) --------
+  if (["CHECKER", "MAKER", "SUPERVISOR"].includes(userRole)) {
+    const currentDataSource =
+      activeWorkTab === "available-work"
+        ? "available_for_me"
+        : "assigned_to_me";
+
+    (checklistData || []).forEach((room) => {
+      collectFromChecklists(room[currentDataSource] || []);
+    });
+  }
+
+  // -------- Extra: stageInfo se bhi ek entry daal do --------
+  if (stageInfo?.stage_id && stageInfo?.stage_name) {
+    stageMap.set(stageInfo.stage_id, stageInfo.stage_name);
+  } else if (stageInfo?.stage?.id && stageInfo?.stage?.name) {
+    stageMap.set(stageInfo.stage.id, stageInfo.stage.name);
+  }
+
+  // Final unique arrays (sorted)
+  const newStageOptions = Array.from(stageMap.entries())
+    .map(([id, name]) => ({ id, name }))
+    .sort((a, b) => String(a.name).localeCompare(String(b.name)));
+
+  const newCategoryOptions = Array.from(categoriesSet).sort((a, b) =>
+    String(a).localeCompare(String(b))
+  );
+
+  console.log("🔎 stageOptions built:", newStageOptions);
+  console.log("🔎 categoryOptions built:", newCategoryOptions);
+
+  setStageOptions(newStageOptions);
+ if (newCategoryOptions.length) {
+    setCategoryOptions(newCategoryOptions);
+  }}, [
+  userRole,
+  projectId,
+  activeTab,
+  activeWorkTab,
+  tabData,
+  checklistData,
+  stageInfo,
+]);
+
+
+
+// useEffect(() => {
+//   // role / project pata nahi to kuch mat karo
+//   if (!userRole || !projectId) return;
+
+//   const stageMap = new Map();    // stage_id -> stage_name
+//   const categoriesSet = new Set();
+
+//   // ---- Items se category + stage collect ----
+//   const collectFromItems = (items = []) => {
+//     items.forEach((item) => {
+//       // Category different fields se try karo
+//       const cat =
+//         item.category ||
+//         item.category_name ||
+//         item.category_label ||
+//         item.category_slug;
+
+//       if (cat) {
+//         categoriesSet.add(cat);
+//       }
+
+//       // Stage bhi item se nikal lo (agar diya ho)
+//       const sId = item.stage_id || item.stage?.id;
+//       const sName = item.stage_name || item.stage?.name;
+//       if (sId && sName) {
+//         stageMap.set(sId, sName);
+//       }
+//     });
+//   };
+
+//   // ---- Checklist level se stage + category collect ----
+//   const collectFromChecklists = (checklists = []) => {
+//     checklists.forEach((chk) => {
+//       // Stage
+//       const sId = chk.stage_id || chk.stage?.id;
+//       const sName = chk.stage_name || chk.stage?.name;
+//       if (sId && sName) {
+//         stageMap.set(sId, sName);
+//       }
+
+//       // Category agar checklist level pe ho
+//       const cat =
+//         chk.category ||
+//         chk.category_name ||
+//         chk.category_label ||
+//         chk.category_slug;
+
+//       if (cat) {
+//         categoriesSet.add(cat);
+//       }
+
+//       // Items me bhi dekh lo
+//       collectFromItems(chk.items || []);
+//     });
+//   };
+
+//   // -------- INITIALIZER (tabData se) --------
+//   if (userRole === "INITIALIZER") {
+//     const currentTabData = tabData[activeTab] || [];
+//     currentTabData.forEach((room) => {
+//       collectFromChecklists(room.checklists || []);
+//     });
+//   }
+
+//   // -------- WORKING ROLES (CHECKER / MAKER / SUPERVISOR) --------
+//   if (["CHECKER", "MAKER", "SUPERVISOR"].includes(userRole)) {
+//     const currentDataSource =
+//       activeWorkTab === "available-work"
+//         ? "available_for_me"
+//         : "assigned_to_me";
+
+//     (checklistData || []).forEach((room) => {
+//       collectFromChecklists(room[currentDataSource] || []);
+//     });
+//   }
+
+//   // -------- Extra: stageInfo se bhi ek entry daal do --------
+//   if (stageInfo?.stage_id && stageInfo?.stage_name) {
+//     stageMap.set(stageInfo.stage_id, stageInfo.stage_name);
+//   } else if (stageInfo?.stage?.id && stageInfo?.stage?.name) {
+//     // agar API nested object de rahi ho
+//     stageMap.set(stageInfo.stage.id, stageInfo.stage.name);
+//   }
+
+//   // Final arrays banaao (sorted, unique)
+//   const newStageOptions = Array.from(stageMap.entries())
+//     .map(([id, name]) => ({ id, name }))
+//     .sort((a, b) => String(a.name).localeCompare(String(b.name)));
+
+//   const newCategoryOptions = Array.from(categoriesSet).sort((a, b) =>
+//     String(a).localeCompare(String(b))
+//   );
+
+//   console.log("🔎 Built stageOptions:", newStageOptions);
+//   console.log("🔎 Built categoryOptions:", newCategoryOptions);
+
+//   setStageOptions(newStageOptions);
+//   setCategoryOptions(newCategoryOptions);
+// }, [
+//   userRole,
+//   projectId,
+//   activeTab,
+//   activeWorkTab,
+//   tabData,
+//   checklistData,
+//   stageInfo,
+// ]);
 
 // useEffect(() => {
 //   if (!userRole || !projectId || !flatId) return;
@@ -5263,6 +6707,768 @@ useEffect(() => {
             </div>
         );
     };
+    const ReportFilterModal = ({
+  onClose,
+  onApply,
+  themeConfig,
+  currentStage,
+  categoryOptions = [],
+  stageOptions = [],
+  defaultStageId = null,
+}) => {
+  // backend-aligned filters
+  const [decisionRole, setDecisionRole] = useState("");      // maker / supervisor / checker
+  const [outcome, setOutcome] = useState("all");             // pass / fail / rework / pending / all
+  const [category, setCategory] = useState("");              // category string
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [includePhotos, setIncludePhotos] = useState(true);  // with_photos
+  const [stageId, setStageId] = useState(
+    defaultStageId ? String(defaultStageId) : ""
+  );
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onApply({
+      // map to our local naming; handleGenerateReport will convert to backend names
+      fromDate: fromDate || null,
+      toDate: toDate || null,
+      includePhotos,
+      category: category || null,
+      decisionRole: decisionRole || null,
+      outcome: outcome === "all" ? null : outcome,
+      stageId: stageId ? Number(stageId) : null,
+    });
+  };
+console.log("🔍 In filter UI, categoryOptions =", categoryOptions);
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div
+        className="w-full max-w-lg rounded-2xl shadow-2xl"
+        style={{
+          background: themeConfig.cardBg,
+          border: `1px solid ${themeConfig.border}`,
+        }}
+      >
+        <form onSubmit={handleSubmit}>
+          {/* Header */}
+          <div
+            className="px-6 py-4 border-b flex items-center justify-between"
+            style={{ borderColor: themeConfig.border }}
+          >
+            <div>
+              <h3
+                className="text-lg font-bold"
+                style={{ color: themeConfig.textPrimary }}
+              >
+                Download Inspection Report
+              </h3>
+              <p
+                className="text-xs mt-1"
+                style={{ color: themeConfig.textSecondary }}
+              >
+                Choose filters – report will be generated exactly as per these
+                selections.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-2 rounded-lg hover:bg-opacity-80 transition-all"
+              style={{
+                background: `${themeConfig.error}20`,
+                color: themeConfig.error,
+              }}
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Body */}
+          <div className="px-6 py-4 space-y-4">
+            {/* Stage info + stage filter */}
+            <div className="grid grid-cols-1 gap-3">
+              {/* Current stage pill */}
+              {currentStage && (
+                <div>
+                  <label
+                    className="block text-xs font-medium mb-1"
+                    style={{ color: themeConfig.textSecondary }}
+                  >
+                    Current Stage
+                  </label>
+                  <div
+                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+                    style={{
+                      background: `${themeConfig.accent}20`,
+                      color: themeConfig.accent,
+                      border: `1px solid ${themeConfig.accent}`,
+                    }}
+                  >
+                    {currentStage}
+                  </div>
+                </div>
+              )}
+
+              {/* Stage filter dropdown */}
+              <div>
+                <label
+                  className="block text-xs font-medium mb-1"
+                  style={{ color: themeConfig.textSecondary }}
+                >
+                  Filter by Stage (optional)
+                </label>
+               <select
+  value={stageId}
+  onChange={(e) => setStageId(e.target.value)}
+>
+  <option value="">All Stages</option>
+  {stageOptions.map((st) => (
+    <option key={st.id} value={st.id}>
+      {st.name}
+    </option>
+  ))}
+</select>
+
+
+              </div>
+            </div>
+
+            {/* Decision Role */}
+            <div>
+              <label
+                className="block text-xs font-medium mb-1"
+                style={{ color: themeConfig.textSecondary }}
+              >
+                Decision Role
+              </label>
+              <div className="flex gap-2 flex-wrap">
+                {[
+                  { key: "", label: "Any Role" },
+                  { key: "maker", label: "Maker" },
+                  { key: "supervisor", label: "Supervisor" },
+                  { key: "checker", label: "Checker" },
+                ].map((opt) => (
+                  <button
+                    key={opt.key || "any"}
+                    type="button"
+                    onClick={() => setDecisionRole(opt.key)}
+                    className="px-3 py-1 rounded-full text-xs font-medium border transition-all"
+                    style={{
+                      background:
+                        decisionRole === opt.key
+                          ? themeConfig.accent
+                          : themeConfig.cardBg,
+                      color:
+                        decisionRole === opt.key
+                          ? "white"
+                          : themeConfig.textPrimary,
+                      borderColor:
+                        decisionRole === opt.key
+                          ? themeConfig.accent
+                          : themeConfig.border,
+                    }}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Outcome filter */}
+            <div>
+              <label
+                className="block text-xs font-medium mb-1"
+                style={{ color: themeConfig.textSecondary }}
+              >
+                Outcome
+              </label>
+              <select
+                value={outcome}
+                onChange={(e) => setOutcome(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg text-sm border"
+                style={{
+                  background: themeConfig.cardBg,
+                  color: themeConfig.textPrimary,
+                  borderColor: themeConfig.border,
+                }}
+              >
+                <option value="all">All</option>
+                <option value="pass">Pass / Completed</option>
+                <option value="fail">Fail / Rejected</option>
+                <option value="rework">Rework / WIP</option>
+                <option value="pending">Pending</option>
+              </select>
+            </div>
+
+            {/* Category filter */}
+            <div>
+              <label
+                className="block text-xs font-medium mb-1"
+                style={{ color: themeConfig.textSecondary }}
+              >
+                Category
+              </label>
+            {categoryOptions && categoryOptions.length > 0 ? (
+  <select
+    value={category}
+    onChange={(e) => setCategory(e.target.value)}
+    className="rf-select"
+  >
+    <option value="">All Categories</option>
+    {categoryOptions.map((name) => (
+      <option key={name} value={name}>
+        {name}
+      </option>
+    ))}
+  </select>
+              ) : (
+                <input
+                  type="text"
+                  placeholder="e.g. Electrical, Plumbing, Finishing"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg text-sm border"
+                  style={{
+                    background: themeConfig.cardBg,
+                    color: themeConfig.textPrimary,
+                    borderColor: themeConfig.border,
+                  }}
+                />
+              )}
+            </div>
+
+            {/* Date range */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label
+                  className="block text-xs font-medium mb-1"
+                  style={{ color: themeConfig.textSecondary }}
+                >
+                  From Date
+                </label>
+                <input
+                  type="date"
+                  value={fromDate}
+                  onChange={(e) => setFromDate(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg text-sm border"
+                  style={{
+                    background: themeConfig.cardBg,
+                    color: themeConfig.textPrimary,
+                    borderColor: themeConfig.border,
+                  }}
+                />
+              </div>
+              <div>
+                <label
+                  className="block text-xs font-medium mb-1"
+                  style={{ color: themeConfig.textSecondary }}
+                >
+                  To Date
+                </label>
+                <input
+                  type="date"
+                  value={toDate}
+                  onChange={(e) => setToDate(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg text-sm border"
+                  style={{
+                    background: themeConfig.cardBg,
+                    color: themeConfig.textPrimary,
+                    borderColor: themeConfig.border,
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Include photos */}
+            <div className="flex items-center justify-between">
+              <div>
+                <div
+                  className="text-xs font-medium mb-1"
+                  style={{ color: themeConfig.textSecondary }}
+                >
+                  Include Photos in Report
+                </div>
+                <p
+                  className="text-xs"
+                  style={{ color: themeConfig.textSecondary }}
+                >
+                  When enabled, only submissions with photos will be included
+                  (Maker / Checker / Supervisor).
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIncludePhotos((v) => !v)}
+                className="relative inline-flex items-center h-6 rounded-full w-11 transition-colors"
+                style={{
+                  background: includePhotos
+                    ? themeConfig.accent
+                    : themeConfig.border,
+                }}
+              >
+                <span
+                  className="inline-block w-5 h-5 transform bg-white rounded-full shadow transition-transform"
+                  style={{
+                    transform: includePhotos
+                      ? "translateX(20px)"
+                      : "translateX(2px)",
+                  }}
+                />
+              </button>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div
+            className="px-6 py-4 border-t flex items-center justify-end gap-3"
+            style={{ borderColor: themeConfig.border }}
+          >
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-lg text-sm font-medium"
+              style={{
+                background: themeConfig.textSecondary,
+                color: "white",
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-6 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
+              style={{
+                background: `linear-gradient(135deg, ${themeConfig.accent}, ${themeConfig.accent}dd)`,
+                color: "white",
+                border: `2px solid ${themeConfig.accent}`,
+              }}
+            >
+              <span>📄</span>
+              <span>Generate Report</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+const OverviewFilterModal = ({
+  onClose,
+  onApply,
+  themeConfig,
+  categoryOptions = [],
+  stageOptions = [],
+  defaultStageId = null,
+}) => {
+  const [stageId, setStageId] = useState(
+    defaultStageId ? String(defaultStageId) : ""
+  );
+  const [category, setCategory] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onApply({
+      stageId: stageId ? Number(stageId) : null,   // 👈 matches buildReportQuery
+      category: category || null,
+    });
+  };
+  console.log("Modal categoryOptions:", categoryOptions);
+  console.log("🔍 In filter UI, categoryOptions =", categoryOptions);
+
+
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div
+        className="w-full max-w-md rounded-2xl shadow-2xl"
+        style={{
+          background: themeConfig.cardBg,
+          border: `1px solid ${themeConfig.border}`,
+        }}
+      >
+        <form onSubmit={handleSubmit}>
+          {/* Header */}
+          <div
+            className="px-6 py-4 border-b flex items-center justify-between"
+            style={{ borderColor: themeConfig.border }}
+          >
+            <h3
+              className="text-lg font-bold"
+              style={{ color: themeConfig.textPrimary }}
+            >
+              Flat Overview Filters
+            </h3>
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-2 rounded-lg hover:bg-opacity-80 transition-all"
+              style={{
+                background: `${themeConfig.error}20`,
+                color: themeConfig.error,
+              }}
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Body */}
+          <div className="px-6 py-4 space-y-4">
+            {/* Stage */}
+            <div>
+              <label
+                className="block text-xs font-medium mb-1"
+                style={{ color: themeConfig.textSecondary }}
+              >
+                Stage (optional)
+              </label>
+              <select
+                value={stageId}
+                onChange={(e) => setStageId(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg text-sm border"
+                style={{
+                  background: themeConfig.cardBg,
+                  color: themeConfig.textPrimary,
+                  borderColor: themeConfig.border,
+                }}
+              >
+                <option value="">All Stages</option>
+                {stageOptions.map((st) => (
+                  <option key={st.id} value={st.id}>
+                    {st.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Category */}
+            <div>
+              <label
+                className="block text-xs font-medium mb-1"
+                style={{ color: themeConfig.textSecondary }}
+              >
+                Category (optional)
+              </label>
+              {categoryOptions.length > 0 ? (
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg text-sm border"
+            style={{
+              background: themeConfig.cardBg,
+              color: themeConfig.textPrimary,
+              borderColor: themeConfig.border,
+            }}
+          >
+            <option value="">All Categories</option>
+            {categoryOptions.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+              ) : (
+                <input
+                  type="text"
+                  placeholder="e.g. Electrical, Plumbing"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg text-sm border"
+                  style={{
+                    background: themeConfig.cardBg,
+                    color: themeConfig.textPrimary,
+                    borderColor: themeConfig.border,
+                  }}
+                />
+              )}
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div
+            className="px-6 py-4 border-t flex items-center justify-end gap-3"
+            style={{ borderColor: themeConfig.border }}
+          >
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-lg text-sm font-medium"
+              style={{
+                background: themeConfig.textSecondary,
+                color: "white",
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-6 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
+              style={{
+                background: `linear-gradient(135deg, ${themeConfig.accent}, ${themeConfig.accent}dd)`,
+                color: "white",
+                border: `2px solid ${themeConfig.accent}`,
+              }}
+            >
+              <span>📄</span>
+              <span>Download Overview</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+//     const ReportFilterModal = ({ onClose, onApply, themeConfig, currentStage }) => {
+//   const [status, setStatus] = useState("all");
+//   const [category, setCategory] = useState("");
+//   const [fromDate, setFromDate] = useState("");
+//   const [toDate, setToDate] = useState("");
+//   const [includePhotos, setIncludePhotos] = useState(true);
+
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
+//     onApply({
+//       status: status === "all" ? null : status,
+//       category: category.trim() || null,
+//       fromDate: fromDate || null,
+//       toDate: toDate || null,
+//       includePhotos,
+//     });
+//   };
+
+//   return (
+//     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+//       <div
+//         className="w-full max-w-lg rounded-2xl shadow-2xl"
+//         style={{
+//           background: themeConfig.cardBg,
+//           border: `1px solid ${themeConfig.border}`,
+//         }}
+//       >
+//         <form onSubmit={handleSubmit}>
+//           {/* Header */}
+//           <div
+//             className="px-6 py-4 border-b flex items-center justify-between"
+//             style={{ borderColor: themeConfig.border }}
+//           >
+//             <div>
+//               <h3
+//                 className="text-lg font-bold"
+//                 style={{ color: themeConfig.textPrimary }}
+//               >
+//                 Download Inspection Report
+//               </h3>
+//               <p
+//                 className="text-xs mt-1"
+//                 style={{ color: themeConfig.textSecondary }}
+//               >
+//                 Choose filters – report will be generated exactly as per these
+//                 selections.
+//               </p>
+//             </div>
+//             <button
+//               type="button"
+//               onClick={onClose}
+//               className="p-2 rounded-lg hover:bg-opacity-80 transition-all"
+//               style={{
+//                 background: `${themeConfig.error}20`,
+//                 color: themeConfig.error,
+//               }}
+//             >
+//               ✕
+//             </button>
+//           </div>
+
+//           {/* Body */}
+//           <div className="px-6 py-4 space-y-4">
+//             {/* Stage info – read-only pill */}
+//             {currentStage && (
+//               <div>
+//                 <label
+//                   className="block text-xs font-medium mb-1"
+//                   style={{ color: themeConfig.textSecondary }}
+//                 >
+//                   Stage
+//                 </label>
+//                 <div
+//                   className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+//                   style={{
+//                     background: `${themeConfig.accent}20`,
+//                     color: themeConfig.accent,
+//                     border: `1px solid ${themeConfig.accent}`,
+//                   }}
+//                 >
+//                   {currentStage}
+//                 </div>
+//               </div>
+//             )}
+
+//             {/* Status filter */}
+//             <div>
+//               <label
+//                 className="block text-xs font-medium mb-1"
+//                 style={{ color: themeConfig.textSecondary }}
+//               >
+//                 Checklist Status
+//               </label>
+//               <select
+//                 value={status}
+//                 onChange={(e) => setStatus(e.target.value)}
+//                 className="w-full px-3 py-2 rounded-lg text-sm border"
+//                 style={{
+//                   background: themeConfig.cardBg,
+//                   color: themeConfig.textPrimary,
+//                   borderColor: themeConfig.border,
+//                 }}
+//               >
+//                 <option value="all">All</option>
+//                 <option value="not_started">Not Started</option>
+//                 <option value="in_progress">In Progress</option>
+//                 <option value="work_in_progress">Work in Progress</option>
+//                 <option value="completed">Completed</option>
+//               </select>
+//             </div>
+
+//             {/* Category filter */}
+//             <div>
+//               <label
+//                 className="block text-xs font-medium mb-1"
+//                 style={{ color: themeConfig.textSecondary }}
+//               >
+//                 Category (optional)
+//               </label>
+//               <input
+//                 type="text"
+//                 placeholder="e.g. Electrical, Plumbing, Finishing"
+//                 value={category}
+//                 onChange={(e) => setCategory(e.target.value)}
+//                 className="w-full px-3 py-2 rounded-lg text-sm border"
+//                 style={{
+//                   background: themeConfig.cardBg,
+//                   color: themeConfig.textPrimary,
+//                   borderColor: themeConfig.border,
+//                 }}
+//               />
+//             </div>
+
+//             {/* Date range */}
+//             <div className="grid grid-cols-2 gap-3">
+//               <div>
+//                 <label
+//                   className="block text-xs font-medium mb-1"
+//                   style={{ color: themeConfig.textSecondary }}
+//                 >
+//                   From Date
+//                 </label>
+//                 <input
+//                   type="date"
+//                   value={fromDate}
+//                   onChange={(e) => setFromDate(e.target.value)}
+//                   className="w-full px-3 py-2 rounded-lg text-sm border"
+//                   style={{
+//                     background: themeConfig.cardBg,
+//                     color: themeConfig.textPrimary,
+//                     borderColor: themeConfig.border,
+//                   }}
+//                 />
+//               </div>
+//               <div>
+//                 <label
+//                   className="block text-xs font-medium mb-1"
+//                   style={{ color: themeConfig.textSecondary }}
+//                 >
+//                   To Date
+//                 </label>
+//                 <input
+//                   type="date"
+//                   value={toDate}
+//                   onChange={(e) => setToDate(e.target.value)}
+//                   className="w-full px-3 py-2 rounded-lg text-sm border"
+//                   style={{
+//                     background: themeConfig.cardBg,
+//                     color: themeConfig.textPrimary,
+//                     borderColor: themeConfig.border,
+//                   }}
+//                 />
+//               </div>
+//             </div>
+
+//             {/* Include photos */}
+//             <div className="flex items-center justify-between">
+//               <div>
+//                 <div
+//                   className="text-xs font-medium mb-1"
+//                   style={{ color: themeConfig.textSecondary }}
+//                 >
+//                   Include Photos in Report
+//                 </div>
+//                 <p
+//                   className="text-xs"
+//                   style={{ color: themeConfig.textSecondary }}
+//                 >
+//                   When enabled, report will show maker/checker photos wherever
+//                   available.
+//                 </p>
+//               </div>
+//               <button
+//                 type="button"
+//                 onClick={() => setIncludePhotos((v) => !v)}
+//                 className="relative inline-flex items-center h-6 rounded-full w-11 transition-colors"
+//                 style={{
+//                   background: includePhotos
+//                     ? themeConfig.accent
+//                     : themeConfig.border,
+//                 }}
+//               >
+//                 <span
+//                   className="inline-block w-5 h-5 transform bg-white rounded-full shadow transition-transform"
+//                   style={{
+//                     transform: includePhotos
+//                       ? "translateX(20px)"
+//                       : "translateX(2px)",
+//                   }}
+//                 />
+//               </button>
+//             </div>
+//           </div>
+
+//           {/* Footer */}
+//           <div
+//             className="px-6 py-4 border-t flex items-center justify-end gap-3"
+//             style={{ borderColor: themeConfig.border }}
+//           >
+//             <button
+//               type="button"
+//               onClick={onClose}
+//               className="px-4 py-2 rounded-lg text-sm font-medium"
+//               style={{
+//                 background: themeConfig.textSecondary,
+//                 color: "white",
+//               }}
+//             >
+//               Cancel
+//             </button>
+//             <button
+//               type="submit"
+//               className="px-6 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
+//               style={{
+//                 background: `linear-gradient(135deg, ${themeConfig.accent}, ${themeConfig.accent}dd)`,
+//                 color: "white",
+//                 border: `2px solid ${themeConfig.accent}`,
+//               }}
+//             >
+//               <span>📄</span>
+//               <span>Generate Report</span>
+//             </button>
+//           </div>
+//         </form>
+//       </div>
+//     </div>
+//   );
+// };
+
 
     // Add before return statement
     const getTabProgress = () => {
@@ -5455,6 +7661,56 @@ useEffect(() => {
 
                 {/* ---- REPORT BUTTON ---- */}
                 {!isMaker && (
+  <button
+    onClick={() => setShowReportFilter(true)}
+    disabled={reportLoading}
+    className={`
+      px-6 py-3 rounded-xl font-medium transition-all shadow-lg text-sm
+      ${reportLoading ? "opacity-60 cursor-not-allowed" : "hover:shadow-xl transform hover:-translate-y-0.5"}
+    `}
+    style={{
+      background: '#ffbe63',
+      color: "white",
+      border: `2px solid #ffbe63`,
+    }}
+  >
+    {reportLoading ? "Generating..." : "📄 Download Report"}
+  </button>
+  
+)}
+<div className="report-modal-footer">
+  {/* <button
+    type="button"
+    className="btn btn-primary"
+    onClick={onDownloadReport}              // existing detailed report
+    disabled={reportLoading}
+  >
+    {reportLoading ? "Generating..." : "Detailed Report"}
+  </button> */}
+
+  {/* <button
+    type="button"
+    className="btn btn-outline-primary"
+    style={{ marginLeft: "8px", borderColor: "#19376D", color: "#19376D" }}
+    onClick={onOverviewClick}               // new overview handler
+    disabled={overviewLoading}
+  >
+    {overviewLoading ? "Generating..." : "Flat Overview"}
+  </button> */}
+  <button
+  type="button"
+  className="btn btn-outline-primary"
+  style={{ marginLeft: "8px", borderColor: "#19376D", color: "#19376D" }}
+  onClick={() => setShowOverviewFilter(true)}      // 👈 open popup
+  disabled={overviewLoading}
+>
+  {overviewLoading ? "Generating..." : "Flat Overview"}
+</button>
+
+</div>
+
+
+                {/* {!isMaker && (
                   <button
                     onClick={() => {
                       if (reportData && reportData.pdf_url) {
@@ -5489,7 +7745,7 @@ useEffect(() => {
                   >
                     {reportLoading ? "Loading..." : "📄 Download Report"}
                   </button>
-                )}
+                )} */}
 
                 <button
                   onClick={handleBack}
@@ -5572,21 +7828,23 @@ useEffect(() => {
                     const roomDetail = rooms.find(
                       (r) => r.id === roomData.room_id
                     );
-                    const roomKey = roomData.room_id || index;
+                    // const roomKey = roomData.room_id || index;
                     const firstChecklist = roomData.checklists?.[0];
 
                     // Enhanced room name logic for INITIALIZER
-                    const roomName =
-                      roomDetail?.rooms || // From fetched room details API
-                      roomDetail?.name || // Alternative field name
-                      firstChecklist?.room_details?.rooms || // From checklist data
-                      firstChecklist?.room_details?.name || // Alternative field name in checklist
-                      roomData.room_details?.rooms || // From room data
-                      roomData.room_details?.name || // Alternative field name in room data
-                      `Room ${roomData.room_id}` || // Fallback with ID
-                      "Unknown Room"; // Final fallback
+                    // const roomName =
+                    //   roomDetail?.rooms || // From fetched room details API
+                    //   roomDetail?.name || // Alternative field name
+                    //   firstChecklist?.room_details?.rooms || // From checklist data
+                    //   firstChecklist?.room_details?.name || // Alternative field name in checklist
+                    //   roomData.room_details?.rooms || // From room data
+                    //   roomData.room_details?.name || // Alternative field name in room data
+                    //   `Room ${roomData.room_id}` || // Fallback with ID
+                    //   "Unknown Room"; // Final fallback
 
                     const allChecklists = roomData.checklists || [];
+                    const roomKey = roomData.room_id || index;
+const roomName = getRoomDisplayName(roomData);
 
                     console.log(
                       `🏠 INITIALIZER Room Debug - ID: ${roomData.room_id}, Name: ${roomName}`
@@ -5705,16 +7963,19 @@ useEffect(() => {
                     const roomDetail = rooms.find(
                       (r) => r.id === roomData.room_id
                     );
-                    const roomKey = roomData.room_id || index;
+                    // const roomKey = roomData.room_id || index;
 
                     // Priority order for room name
-                    const roomName =
-                      roomDetail?.rooms || // From fetched room details
-                      roomData.room_details?.rooms || // From API response
-                      roomDetail?.name || // Alternative field name
-                      roomData.room_details?.name || // Alternative field name
-                      `Room ${roomData.room_id}` || // Fallback with ID
-                      "Unknown Room"; // Final fallback
+                    // const roomName =
+                    //   roomDetail?.rooms || // From fetched room details
+                    //   roomData.room_details?.rooms || // From API response
+                    //   roomDetail?.name || // Alternative field name
+                    //   roomData.room_details?.name || // Alternative field name
+                    //   `Room ${roomData.room_id}` || // Fallback with ID
+                    //   "Unknown Room"; // Final fallback
+                      const roomKey = roomData.room_id || index;
+const roomName = getRoomDisplayName(roomData);
+
 
                     // Get items based on active tab
                     const currentTabDataSource =
@@ -7268,6 +9529,48 @@ useEffect(() => {
 
         <HistoryModal />
         <ConfirmationDialog />
+        {/* {showReportFilter && (
+          <ReportFilterModal
+            onClose={() => setShowReportFilter(false)}
+            onApply={handleGenerateReport}
+            themeConfig={themeConfig}
+          />
+        )} */}
+        {/* {showReportFilter && (
+  <ReportFilterModal
+    onClose={() => setShowReportFilter(false)}
+  onApply={(filters) => handleGenerateReport(filters)} // ✅ yahi call
+    themeConfig={themeConfig}
+    currentStage={stageInfo?.stage_name || "Current Stage"}
+  />
+)} */}
+{showReportFilter && (
+  <ReportFilterModal
+    onClose={() => setShowReportFilter(false)}
+    onApply={handleGenerateReport}
+    themeConfig={themeConfig}
+    currentStage={stageInfo?.stage_name || "Current Stage"}
+    categoryOptions={categoryOptions}
+    stageOptions={stageOptions}
+    defaultStageId={stageId}
+  />
+)}
+{showOverviewFilter && (
+  <OverviewFilterModal
+    onClose={() => setShowOverviewFilter(false)}
+    onApply={(filters) => {
+      setLastOverviewFilters(filters);
+      handleDownloadOverview(flatId, filters, setOverviewLoading);
+      setShowOverviewFilter(false);
+    }}
+    themeConfig={themeConfig}
+    categoryOptions={categoryOptions}
+    stageOptions={stageOptions}
+    defaultStageId={stageId}
+  />
+)}
+
+
       </div>
     );
 

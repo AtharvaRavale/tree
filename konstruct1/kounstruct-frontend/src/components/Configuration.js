@@ -1505,10 +1505,26 @@ try {
     // While loading, fallback to id as label
     return "Project " + project.id;
   };
+const handleProjectClick = (project) => {
+  const roleLower = (role || "").toLowerCase();
 
-  const handleProjectClick = (project) => {
+  const isProjectManagerOrHead =
+    isManagerRole ||
+    roleLower.includes("project manager") ||
+    roleLower.includes("project head");
+
+  if (isProjectManagerOrHead) {
+    // 👉 Manager / Head yahan jayega
+    navigate(`/overview/project/${project.id}`, { state: { project } });
+  } else {
+    // 👉 Baaki sab yahan jayenge
     navigate(`/project/${project.id}`, { state: { project } });
-  };
+  }
+};
+
+  // const handleProjectClick = (project) => {
+  //   navigate(`/project/${project.id}`, { state: { project } });
+  // };
 
   const [flagsByProject, setFlagsByProject] = useState({});   // { [id]: flagsJson }
   const [flagModalOpen, setFlagModalOpen] = useState(null);   // projectId or null

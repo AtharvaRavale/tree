@@ -188,9 +188,16 @@ const isAdmin = role === "Admin";
     { value: "SECURITY_GUARD", label: "SECURITY GUARD" },
     { value: "Intializer", label: "INITIALIZER" },
   ];
+    const MANAGER_ROLE_OPTIONS = [
+    { value: "MANAGER", label: "Manager" },
+    { value: "PROJECT_MANAGER", label: "Project Manager" },
+    { value: "PROJECT_HEAD", label: "Project Head" },
+  ];
+
+  const [managerRole, setManagerRole] = useState(""); // NEW
 
   // ========== VALIDATION ==========
-  const isBasicDetailsValid = useCallback(() => {
+    const isBasicDetailsValid = useCallback(() => {
     const baseValid =
       basicUserDetails.username &&
       basicUserDetails.first_name &&
@@ -202,8 +209,11 @@ const isAdmin = role === "Admin";
 
     // When this screen is used to create a MANAGER
     // and current user can pick org → org is mandatory
-    if (canCreateManager && canSeeOrganization && !selectedOrgId) {
-      return false;
+    if (canCreateManager && canSeeOrganization) {
+      if (!selectedOrgId) return false;
+
+      // 🔹 Manager type dropdown bhi required hai
+      if (!managerRole) return false;
     }
 
     return true;
@@ -212,7 +222,32 @@ const isAdmin = role === "Admin";
     canCreateManager,
     canSeeOrganization,
     selectedOrgId,
+    managerRole,          // NEW dep
   ]);
+
+  // const isBasicDetailsValid = useCallback(() => {
+  //   const baseValid =
+  //     basicUserDetails.username &&
+  //     basicUserDetails.first_name &&
+  //     basicUserDetails.last_name &&
+  //     basicUserDetails.email &&
+  //     basicUserDetails.password;
+
+  //   if (!baseValid) return false;
+
+  //   // When this screen is used to create a MANAGER
+  //   // and current user can pick org → org is mandatory
+  //   if (canCreateManager && canSeeOrganization && !selectedOrgId) {
+  //     return false;
+  //   }
+
+  //   return true;
+  // }, [
+  //   basicUserDetails,
+  //   canCreateManager,
+  //   canSeeOrganization,
+  //   selectedOrgId,
+  // ]);
 
 //   const isBasicDetailsValid = useCallback(() => {
 //     return (
@@ -915,6 +950,7 @@ else if (canCreateManager) {
       is_manager: true,
       is_client: false,
       has_access: true,
+      role: managerRole,
     },
     access: {
       project_id: null,
@@ -1414,6 +1450,8 @@ if (!projectsArray.length) {
     setAvailableBuildings([]);
     setAvailableZones([]);
     resetCategorySelections();
+     setSelectedOrgId("");   // optional
+    setManagerRole(""); 
   };
 
   // ========== LOAD PROJECTS ON MAPPING MODAL OPEN ==========
@@ -1836,6 +1874,33 @@ if (!projectsArray.length) {
                       </select>
                     </div>
                   )}
+                  
+                  {/* 🔹 Manager Type (MANAGER / PROJECT_MANAGER / PROJECT_HEAD) */}
+                  {canCreateManager && (
+                    <div className="grid grid-cols-3 gap-3 items-center mt-1">
+                      <label className="text-sm font-medium text-end">
+                        Manager Role<span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        className="col-span-2 w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        style={{
+                          background: cardColor,
+                          border: `1px solid ${borderColor}`,
+                          color: textColor,
+                        }}
+                        value={managerRole}
+                        onChange={(e) => setManagerRole(e.target.value)}
+                      >
+                        <option value="">Select role</option>
+                        {MANAGER_ROLE_OPTIONS.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
 
 
                   {/* Buttons */}

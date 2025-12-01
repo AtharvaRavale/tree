@@ -2356,6 +2356,50 @@ function getInitials(user) {
   }
   return "";
 }
+// ---- Helper: Display Role (same logic as login) ----
+function getDisplayRole(userData, accesses) {
+  if (!userData) return "User";
+
+  let allRoles = [];
+  if (Array.isArray(accesses)) {
+    accesses.forEach((access) => {
+      if (Array.isArray(access.roles)) {
+        access.roles.forEach((role) => {
+          const roleStr = typeof role === "string" ? role : role?.role;
+          if (roleStr) {
+            allRoles.push(roleStr);
+          }
+        });
+      }
+    });
+  }
+
+  const uniqueRoles = [...new Set(allRoles)];
+  const upperRoles = uniqueRoles.map((r) => String(r).toUpperCase());
+
+  // 🔺 top-level flags – sabse upar priority
+  if (userData?.superadmin || userData?.is_staff) return "Super Admin";
+  if (userData?.is_client) return "Admin";
+
+  // 🔺 NEW: watcher flags from token / USER_DATA
+  if (userData?.is_project_head) return "Project Head";
+  if (userData?.is_project_manager) return "Project Manager";
+
+  // normal manager
+  if (userData?.is_manager) return "Manager";
+
+  // agar accesses ke roles me hi PROJECT_HEAD / PROJECT_MANAGER ho
+  if (upperRoles.includes("PROJECT_HEAD")) return "Project Head";
+  if (upperRoles.includes("PROJECT_MANAGER")) return "Project Manager";
+
+  // baaki saare roles comma separated
+  if (uniqueRoles.length > 0) {
+    return uniqueRoles.join(", ");
+  }
+
+  return "User";
+}
+
 
 function Profile({ onClose }) {
   const [manage, setManage] = useState(false);
@@ -3110,31 +3154,32 @@ useEffect(() => {
     }
   }, [hydrated, userData, navigate]);
 
-  let allRoles = [];
-  if (Array.isArray(accesses)) {
-    accesses.forEach((access) => {
-      if (access.roles && Array.isArray(access.roles)) {
-        access.roles.forEach((role) => {
-          const roleStr = typeof role === "string" ? role : role?.role;
-          if (roleStr && !allRoles.includes(roleStr)) {
-            allRoles.push(roleStr);
-          }
-        });
-      }
-    });
-  }
+  // let allRoles = [];
+  // if (Array.isArray(accesses)) {
+  //   accesses.forEach((access) => {
+  //     if (access.roles && Array.isArray(access.roles)) {
+  //       access.roles.forEach((role) => {
+  //         const roleStr = typeof role === "string" ? role : role?.role;
+  //         if (roleStr && !allRoles.includes(roleStr)) {
+  //           allRoles.push(roleStr);
+  //         }
+  //       });
+  //     }
+  //   });
+  // }
 
-  let role = "User";
-  if (userData?.superadmin || userData?.is_staff) {
-    role = "Super Admin";
-  } else if (userData?.is_client) {
-    role = "Admin";
-  } else if (userData?.is_manager) {
-    role = "Manager";
-  } else if (allRoles.length > 0) {
-    const uniqueRoles = [...new Set(allRoles)];
-    role = uniqueRoles.join(", ");
-  }
+  // let role = "User";
+  // if (userData?.superadmin || userData?.is_staff) {
+  //   role = "Super Admin";
+  // } else if (userData?.is_client) {
+  //   role = "Admin";
+  // } else if (userData?.is_manager) {
+  //   role = "Manager";
+  // } else if (allRoles.length > 0) {
+  //   const uniqueRoles = [...new Set(allRoles)];
+  //   role = uniqueRoles.join(", ");
+  // }
+  const role = getDisplayRole(userData, accesses);
 
   useEffect(() => {
     localStorage.setItem("ROLE", role);
