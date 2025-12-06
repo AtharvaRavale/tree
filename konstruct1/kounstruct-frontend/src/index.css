@@ -57,3 +57,14 @@ code {
   background-color: #e5e7eb;
 } */
 
+
+/* A4 ek page ke liye optimize */
+/* @media print {
+  #mir-print-root td {
+    padding: 4px !important;
+  }
+
+  #mir-print-root th {
+    padding: 4px !important;
+  }
+} */

@@ -1067,12 +1067,32 @@ function Header() {
             </h2>
           </span>
         </div>
+        
 
         {/* Right actions */}
         <ul
           className="hidden md:flex justify-end items-center gap-5 py-2 uppercase text-sm"
           style={{ marginLeft: "auto" }}
         >
+           
+        
+          {/* 🔹 NEW: MIR create link (sab roles ke liye) */}
+          <NavLink
+            to="/mir/create"
+            className="font-medium flex items-center gap-1"
+            style={{ color: textColor, textDecoration: "none" }}
+            title="Material Inspection Request"
+          >
+            📦 MIR
+          </NavLink>
+          <NavLink
+            to="/mir/inbox"
+            className="font-medium flex items-center gap-1"
+            style={{ color: textColor, textDecoration: "none" }}
+            title="My MIR Inbox"
+          >
+            📥 MIR Inbox
+          </NavLink>
           {/* Analytics: hidden for security guard; onClick triggers API */}
         {!isSecurityGuard && !isProjectManagerOrHead &&(
   <NavLink

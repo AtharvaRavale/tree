@@ -178,8 +178,10 @@ import GuardOnboarding from "./components/GuardOnboarding";
 import GuardAttendance from "./components/GuardAttendance";
 import AttendanceProjectPage from "./components/AttendanceProjectPage";
 import ProjectOverview from "./components/ProjectOverview";
-
-
+import MIRCreatePage from "./components/MIRCreatePage";
+import MIRInboxPage from "./components/MIRInboxPage";
+import MIRDetailPage from "./components/MIRDetailPage";
+import FlatReport from "./components/FlatReport";
 // For body background
 function BodyBgController() {
   const { theme } = useTheme();
@@ -260,6 +262,8 @@ function AppRoutes() {
           path="/user-management-setup"
           element={<UserManagementSetup />}
         />
+        <Route path="/projects/:id/flat-report/:flatId" element={<FlatReport />} />
+
         <Route path="/project/:id" element={<ProjectDetails />} />
         <Route path="/snagging/:id" element={<Snagging />} />
         <Route path="/Level/:id" element={<FlatMatrixTable />} />
@@ -277,10 +281,14 @@ function AppRoutes() {
           path="/PendingSupervisorItems"
           element={<PendingSupervisorItems />}
         />
+        <Route path="/mir/create" element={<MIRCreatePage />} />
+        <Route path="/mir/:id" element={<MIRDetailPage />} />
+        <Route path="/mir/inbox" element={<MIRInboxPage />} />
         <Route
   path="/attendance/project"
   element={<AttendanceProjectPage />}
 />
+
 
         <Route path="/UsersManagement" element={<UsersManagement />} />
         <Route path="/Initialize-Checklist" element={<InitializeChecklist />} />

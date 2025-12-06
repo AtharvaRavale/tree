@@ -1377,3 +1377,235 @@ export function getManagerOwnedProjects(organizationId) {
     { params: { organization_id: organizationId } }
   );
 }
+
+
+
+
+// ==== MIR (Material Inspection Request) ====
+
+// 1) Create MIR (DRAFT) – same jaisa tumne Postman me kiya
+export const createMIR = async (data) =>
+  axiosInstance.post("/mir/", data, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+// 2) List MIRs (filters: project_id, only_assigned etc.)
+export const listMIRs = async (params = {}) =>
+  axiosInstance.get("/mir/", {
+    params,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+// 3) Get single MIR by id
+export const getMIRById = async (id) =>
+  axiosInstance.get(`/mir/${id}/`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+// 4) Update MIR (PATCH – partial update)
+export const updateMIR = async (id, data) =>
+  axiosInstance.patch(`/mir/${id}/`, data, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+
+export const getProjectUsersForMir = async (projectId) =>
+  axiosInstance.get("/user-access-role/", {
+    params: { project_id: projectId },
+    headers: { "Content-Type": "application/json" },
+  });
+
+  // ---- MIR workflow: forward / accept / reject ----
+
+// Forward MIR to another user
+// payload = { to_user_id, comment }
+export const forwardMIR = async (id, payload) =>
+  axiosInstance.post(`/mir/${id}/forward/`, payload, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+// Accept MIR (current_assignee hi kar sakta hai)
+// payload optional = { comment }
+export const acceptMIR = async (id, payload = {}) =>
+  axiosInstance.post(`/mir/${id}/accept/`, payload, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+// Reject MIR (current_assignee hi kar sakta hai)
+// payload = { comment }
+export const rejectMIR = async (id, payload = {}) =>
+  axiosInstance.post(`/mir/${id}/reject/`, payload, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+
+  export const getMIRDetail = (id) =>
+  axiosInstance.get(`/mir/${id}/`, {
+    headers: { "Content-Type": "application/json" },
+  });
+
+
+// 👇 MIR ke liye: current creator ke saare users
+export const getUsersByCreator = async () =>
+  axiosInstance.get("/users-by-creator/", {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  // ---- MIR digital signatures ----
+// NOTE: formData = new FormData()
+// formData.append("signature", file)
+// formData.append("name", optionalName)
+// formData.append("sign_date", "2025-12-01T10:15:00+05:30") // optional
+
+export const signStoreMIR = async (id, formData) =>
+  axiosInstance.post(`/mir/${id}/sign_store/`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+export const signQcMIR = async (id, formData) =>
+  axiosInstance.post(`/mir/${id}/sign_qc/`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+export const signProjectInchargeMIR = async (id, formData) =>
+  axiosInstance.post(`/mir/${id}/sign_project_incharge/`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+
+
+
+
+// MIR complete history / timeline
+// GET /mir-actions/?mir_id=1
+export const getMIRActions = async (mirId) =>
+  axiosInstance.get("/mir-actions/", {
+    params: { mir_id: mirId },
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+
+
+
+
+
+  // MIR ke liye: project ke users laane ka simple API
+export const getUsersByProject = (projectId) =>
+  axiosInstance.get("/by-project/", {
+    params: { project_id: projectId },
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+
+
+
+export const getMyAssignedMIRs = (params = {}) =>
+  axiosInstance.get("/mir/", {
+    params: {
+      only_assigned: 1,
+      ...params, // future me pagination, project filter, etc.
+    },
+  });
+
+
+
+
+
+export const uploadMIRMaterialImages = (mirId, formData) =>
+  axiosInstance.post(`/mir/${mirId}/material-images/`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  // ---- MIR SIGNATURE APIs ----
+// POST /mir/{id}/sign_store/
+export const signMIRStore = (mirId, { name, sign_date, file }) => {
+  const fd = new FormData();
+  if (file) fd.append("signature", file);        // 👈 file required
+  if (name) fd.append("name", name);             // optional
+  if (sign_date) fd.append("sign_date", sign_date); // "YYYY-MM-DD" bhi chalega
+
+  return axiosInstance.post(`/mir/${mirId}/sign_store/`, fd, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
+
+// POST /mir/{id}/sign_qc/
+export const signMIRQc = (mirId, { name, sign_date, file }) => {
+  const fd = new FormData();
+  if (file) fd.append("signature", file);
+  if (name) fd.append("name", name);
+  if (sign_date) fd.append("sign_date", sign_date);
+
+  return axiosInstance.post(`/mir/${mirId}/sign_qc/`, fd, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
+
+// POST /mir/{id}/sign_project_incharge/
+export const signMIRProjectIncharge = (mirId, { name, sign_date, file }) => {
+  const fd = new FormData();
+  if (file) fd.append("signature", file);
+  if (name) fd.append("name", name);
+  if (sign_date) fd.append("sign_date", sign_date);
+
+  return axiosInstance.post(`/mir/${mirId}/sign_project_incharge/`, fd, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
+
+
+
+
+
+
+
+export const uploadMIRAttachments = (mirId, formData) =>
+  axiosInstance.post(`/mir/${mirId}/attachments/`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+
+
+
+
+
+// Logo upload
+export function uploadMIRLogo(mirId, formData) {
+  return axiosInstance.post(`/mir/${mirId}/logo/`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+}
+
+
+

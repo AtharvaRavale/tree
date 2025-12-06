@@ -9,16 +9,7 @@ import { showToast } from "../utils/toast";
 import CRMHandoverForm from "./CRMHandoverForm";
 
 
-// // To show an error
-// showToast("Failed to load organizations info.", "error");
 
-// // To show a success message
-// showToast("Saved successfully!", "success");
-
-// // To show an info/warning message
-// showToast("Check your connection.", "warning");
-
-// Add after imports, before getCurrentUserRole
 class ErrorBoundary extends React.Component {
     constructor(props) {
         super(props);
@@ -362,11 +353,7 @@ const FlatInspectionPage = () => {
     const navigate = useNavigate();
     const { flatId } = useParams();
 
-// const [reportData, setReportData] = useState(null);
-// const [reportLoading, setReportLoading] = useState(false);
-// const [reportError, setReportError] = useState(null);
-// const [showReportFilter, setShowReportFilter] = useState(false);
-    // Get data from navigation state
+
     const { projectId, flatNumber, flatType } = location.state || {};
 
     // State management
@@ -516,32 +503,6 @@ const mergeFiles = (prev = [], next = []) => {
   }
   return [...prev, ...toAdd];
 };
-// const LocalPhotoPreview = ({ files = [], onRemove, borderColor = '#ddd' }) => {
-//   if (!files.length) return null;
-//   return (
-//     <div className="flex flex-wrap gap-2 mt-2">
-//       {files.map((f, i) => (
-//         <div key={`${f.name}-${f.size}-${f.lastModified}-${i}`} className="relative">
-//           <img
-//             src={URL.createObjectURL(f)}
-//             alt={`preview-${i}`}
-//             className="w-24 h-16 object-cover rounded border"
-//             style={{ borderColor }}
-//           />
-//           <button
-//             type="button"
-//             onClick={() => onRemove?.(i)}
-//             className="absolute -top-2 -right-2 w-6 h-6 rounded-full text-white text-xs"
-//             style={{ background: '#ef4444' }}
-//             aria-label="Remove image"
-//           >
-//             ×
-//           </button>
-//         </div>
-//       ))}
-//     </div>
-//   );
-// };
 
 
     // Universal tab state for working roles (CHECKER, MAKER, SUPERVISOR)
@@ -580,23 +541,7 @@ const getLatestSubmission = (item) => {
   )[0];
 };
 
-// return photos for a given role with multi-field + single-field fallbacks
-// const getRolePhotos = (latest, role) => {
-//   if (!latest) return [];
-//   const multi = normalizeSources(latest?.[`${role}_media_multi`]); // e.g. checker_media_multi
-//   if (multi?.length) return multi;
 
-//   // common fallbacks from your API variants
-//   const fallbacks = [
-//     latest?.[`${role}_media`],                                     // checker_media / supervisor_media
-//     role === 'checker' ? latest?.inspector_photo : latest?.reviewer_photo,
-//     latest?.media, latest?.photo, latest?.image
-//   ].filter(Boolean);
-
-//   return fallbacks;
-// };
-// normalize to array
-// Force correct base + path for submission images
 const toChecklistMediaUrl = (url) => {
   if (!url) return null;
   let u = String(url).trim();
@@ -628,28 +573,6 @@ const toChecklistMediaUrl = (url) => {
 
 const norm = (v) => (Array.isArray(v) ? v.filter(Boolean) : v ? [v] : []);
 
-// collect all photo fields for a role, dedup
-// const getRolePhotos = (submission, role) => {
-//   if (!submission) return [];
-//   const keysMap = {
-//     maker: [
-//       'maker_media_multi', 'send_maker_media_multi',
-//       'maker_media', 'media', 'photo', 'image'
-//     ],
-//     checker: [
-//       'checker_media_multi', 'send_checker_media_multi', // <-- important
-//       'inspector_photo', 'checker_media', 'media', 'photo', 'image'
-//     ],
-//     supervisor: [
-//       'supervisor_media_multi', 'send_supervisor_media_multi',
-//       'reviewer_photo', 'supervisor_media', 'media', 'photo', 'image'
-//     ],
-//   };
-//   const keys = keysMap[role] || [];
-//   const all = keys.flatMap(k => norm(submission?.[k]));
-//   // dedup (exact string match)
-//   return Array.from(new Set(all));
-// };
 const getRolePhotos = (submission, role) => {
   if (!submission) return [];
   const keysMap = {
@@ -756,14 +679,7 @@ const getLatestSubmissionWithMedia = (item, role) => {
         }, delay + 500);
     };
 
-    // ———————————————————————————————————————————————
-// NOTE BANNER: shows API "note" with stage IDs replaced by stage names.
-// Stage names are bold + accent colored.
-// ———————————————————————————————————————————————
-// ———————————————————————————————————————————————
-// NOTE BANNER: shows API "note" with stage IDs replaced by stage names.
-// Matches "stage 73", "Stage:73", "stage-73", "stage#73", etc.
-// ———————————————————————————————————————————————
+  
 const NoteBanner = ({ note, themeConfig }) => {
   const [parts, setParts] = React.useState(note ? [note] : []);
 
@@ -922,32 +838,8 @@ const statusByTab = {
             },
         });
 
-    // const fetchTabData = async (tabKey) => {
-    //     const tabConfig = initializerTabs.find(tab => tab.key === tabKey);
-    //     if (!tabConfig) return;
-
-    //     setTabLoading(prev => ({ ...prev, [tabKey]: true }));
-
-    //     try {
-    //         const token = localStorage.getItem("ACCESS_TOKEN");
-    //         const apiUrl = '/Transafer-Rule-getchchklist/';
-    //         const params = {
-    //             project_id: projectId,
-    //             flat_id: flatId,
-    //             status: tabConfig.apiStatus
-    //         };
-
-    //         console.log(`🔍 FETCHING TAB DATA - Tab: ${tabKey}, Status: ${tabConfig.apiStatus}`);
-
-    //         setPerformanceMetrics(prev => ({ ...prev, apiCalls: prev.apiCalls + 1 }));
-    //         const response = await checklistInstance.get(apiUrl, {
-    //             params: params,
-            
-    //             headers: {
-    //                 Authorization: `Bearer ${token}`,
-    //                 "Content-Type": "application/json",
-    //             },
-    //         });
+   
+    
 
             if (response.status === 200) {
                 const responseData = response.data || {};
@@ -984,33 +876,7 @@ const statusByTab = {
             setTabLoading(prev => ({ ...prev, [tabKey]: false }));
         }
     };
-// filters: tumhare modal ka state
-// function buildReportQuery(filters = {}) {
-//   const params = new URLSearchParams();
 
-//   if (filters.fromDate) params.append("from_date", filters.fromDate);      // "YYYY-MM-DD"
-//   if (filters.toDate) params.append("to_date", filters.toDate);            // "YYYY-MM-DD"
-//   if (filters.decisionRole) params.append("decision_role", filters.decisionRole); // maker/supervisor/checker
-//   if (filters.outcome) params.append("outcome", filters.outcome);          // pass/fail/rework/pending
-//   if (filters.withPhotos) params.append("with_photos", "true");
-
-//   // NEW: stage + category
-//   if (filters.stageId) params.append("stage_id", filters.stageId);
-//   if (filters.category) params.append("category", filters.category);
-
-//   return params.toString();
-// }
-
-    // Handle tab switching with on-demand loading
-    // const handleTabSwitch = async (tabKey) => {
-    //     setActiveTab(tabKey);
-
-    //     // Always refresh data for active tab to ensure consistency
-    //     await fetchTabData(tabKey);
-
-    //     // Clear any existing selections when switching tabs
-    //     setSelectedForBulk(new Set());
-    // };
 
   const handleTabSwitch = async (tabKey) => {
   setActiveTab(tabKey);
@@ -1148,221 +1014,9 @@ useEffect(() => {
     }
   })();
 }, [flatId]);
-// useEffect(() => {
-//   if (!userRole || !projectId) return;
-
-//   const stageMap = new Map();
-//   const categoriesSet = new Set();
-
-//   // collectFromItems(...)
-//   // collectFromChecklists(...)
-//   // INITIALIZER ke liye tabData se
-//   // CHECKER / MAKER / SUPERVISOR ke liye checklistData se
-//   // + stageInfo se stage add karo
-
-//   const newStageOptions = Array.from(stageMap.entries())
-//     .map(([id, name]) => ({ id, name }))
-//     .sort((a, b) => String(a.name).localeCompare(String(b.name)));
-
-//   const newCategoryOptions = Array.from(categoriesSet).sort((a, b) =>
-//     String(a).localeCompare(String(b))
-//   );
-
-//   console.log("🔎 Built stageOptions:", newStageOptions);
-//   console.log("🔎 Built categoryOptions:", newCategoryOptions);
-
-//   setStageOptions(newStageOptions);
-//   setCategoryOptions(newCategoryOptions);
-// }, [
-//   userRole,
-//   projectId,
-//   activeTab,
-//   activeWorkTab,
-//   tabData,
-//   checklistData,
-//   stageInfo,
-// ]);
-
-// useEffect(() => {
-//   console.log("useEffect triggered!", flatId);
-//   if (!flatId) return;
-
-//   const token = localStorage.getItem("ACCESS_TOKEN");
-//   if (!token) {
-//     console.warn("No token, cannot preload report meta");
-//     return;
-//   }
-
-//   console.log("Preloading report meta for FlatId:", flatId);
-
-//   (async () => {
-//     try {
-//       const res = await NEWchecklistInstance.get(
-//         `/flat-report/${flatId}/`,
-//         {
-//           headers: {
-//             Authorization: `Bearer ${token}`,
-//           },
-//           timeout: 60000,
-//         }
-//       );
-
-//       const data = res.data || {};
-//       console.log("📄 Report Data (preload):", data);
-//       setReportData(data);
-
-//       // 🔹 YAHI SE STAGES + CATEGORIES NIKALO
-//       if (Array.isArray(data.stages)) {
-//         const stageList = [];
-//         const catSet = new Set();
-
-//         data.stages.forEach((stage) => {
-//           // stageOptions
-//           if (stage.stage_id && stage.stage_name) {
-//             stageList.push({
-//               id: stage.stage_id,
-//               name: stage.stage_name,
-//             });
-//           }
-
-//           // categoryOptions: stage ke andar wali checklists se
-//           (stage.checklists || []).forEach((chk) => {
-//             const cat =
-//               chk.category ||
-//               chk.category_name ||
-//               chk.category_label ||
-//               chk.category_slug;
-
-//             if (cat) catSet.add(cat);
-//           });
-//         });
-
-//         console.log("✅ Built stageOptions from flat-report:", stageList);
-//         console.log(
-//           "✅ Built categoryOptions from flat-report:",
-//           Array.from(catSet)
-//         );
-
-//         setStageOptions(stageList);
-//         setCategoryOptions(Array.from(catSet));
-//       }
-//     } catch (error) {
-//       console.error("❌ flat-report preload failed:", error);
-//       setReportError(
-//         error.response?.data?.detail ||
-//           error.message ||
-//           "Failed to preload report"
-//       );
-//     }
-//   })();
-// }, [flatId]);
-
-// useEffect(() => {
-//     console.log("useEffect triggered!", flatId);
-
-//     if (!flatId) return;
-
-//     console.log("Fetching report for FlatId:", flatId);
-
-//    fetch(`https://konstruct.world/checklists/flat-report/${flatId}/`, {
-//     headers: {
-//         "Authorization": `Bearer ${token}`,
-//         "Content-Type": "application/json"
-//     }
-// })
-// .then(res => {
-//     if (!res.ok) throw new Error("Network response was not ok");
-//     return res.json();   // <-- THIS is needed!
-// })
-// .then(data => {
-//     console.log("Report Data:", data); // This will now be the JSON object
-//     setReportData(data);
-// })
-// .catch(error => {
-//     console.log("Fetch error:", error);
-//     setReportError(error.message);
-// });
-
-// }, [flatId]);
 
 console.log("Flat ID for report fetch:", flatId);
 
-// const handleGenerateReport = async (filters) => {
-//   try {
-//     setReportLoading(true);
-//     setShowReportFilter(false);
-
-//     const token = localStorage.getItem("ACCESS_TOKEN");
-
-//     // 🔧 Build query params for backend (same filters as before)
-//     const params = new URLSearchParams({
-//       scope: filters.scope,                              // all | failed | pending
-//       include_photos: filters.includePhotos ? "1" : "0",
-//       group_by_room: filters.groupByRoom ? "1" : "0",
-//       include_roles: [
-//         filters.includeMaker && "maker",
-//         filters.includeChecker && "checker",
-//         filters.includeSupervisor && "supervisor",
-//       ]
-//         .filter(Boolean)
-//         .join(","), // e.g. "maker,checker,supervisor"
-//     });
-
-//     // 🔗 Use your actual API:
-//     // https://konstruct.world/checklists/flat-report/${flatId}/
-//     const url = `https://konstruct.world/checklists/flat-report/${flatId}/?${params.toString()}`;
-
-//     const res = await fetch(url, {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//         "Content-Type": "application/json",
-//       },
-//     });
-
-//     if (!res.ok) {
-//       throw new Error("Network response was not ok");
-//     }
-
-//     const data = await res.json();
-//     console.log("Filtered Report Data:", data);
-
-//     // Optional: keep in state like your useEffect
-//     setReportData(data);
-
-//     if (data?.pdf_url) {
-//       window.open(
-//         data.pdf_url.startsWith("http")
-//           ? data.pdf_url
-//           : `https://konstruct.world${data.pdf_url}`,
-//         "_blank"
-//       );
-//     } else {
-//       toast.error("Report URL not found", {
-//         style: {
-//           background: themeConfig.error,
-//           color: "white",
-//           borderRadius: "12px",
-//         },
-//       });
-//     }
-//   } catch (err) {
-//     console.error("❌ Report generation failed:", err);
-//     toast.error(
-//       err?.message ||
-//         err.response?.data?.detail ||
-//         "Failed to generate report. Please try again.",
-//       {
-//         style: {
-//           background: themeConfig.error,
-//           color: "white",
-//           borderRadius: "12px",
-//         },
-//       }
-//     );
-//   } finally {
-//     setReportLoading(false);
-//   }
-// };
 
     useEffect(() => {
         const styleElement = document.createElement('style');
@@ -1562,48 +1216,6 @@ const ImageStrip = ({ sources = [], themeConfig }) => (
   </div>
 );
 
-
-// useEffect(() => {
-//   const cats = new Set();
-
-//   const collectFromItems = (items = []) => {
-//     items.forEach((item) => {
-//       const cat =
-//         item.category ||
-//         item.category_name ||
-//         item.category_label ||
-//         item.category_text ||
-//         null;
-//       if (cat) {
-//         cats.add(String(cat).trim());
-//       }
-//     });
-//   };
-
-//   if (userRole === "INITIALIZER") {
-//     // INITIALIZER → tabData[tabKey].checklists[].items
-//     Object.values(tabData || {}).forEach((roomsArray) => {
-//       (roomsArray || []).forEach((roomObj) => {
-//         (roomObj.checklists || []).forEach((cl) =>
-//           collectFromItems(cl.items || [])
-//         );
-//       });
-//     });
-//   } else {
-//     // Working roles → checklistData[].available_for_me / assigned_to_me
-//     (checklistData || []).forEach((roomObj) => {
-//       ["available_for_me", "assigned_to_me", "pending_for_me"].forEach(
-//         (key) => {
-//           (roomObj[key] || []).forEach((cl) =>
-//             collectFromItems(cl.items || [])
-//           );
-//         }
-//       );
-//     });
-//   }
-
-//   setCategoryOptions(Array.from(cats).sort());
-// }, [userRole, tabData, checklistData]);
 
 useEffect(() => {
   const cats = new Set();
@@ -3124,42 +2736,7 @@ useEffect(() => {
                             Complete Work
                         </button>
                     </div>
-                </div>{/* Latest Maker Submission for CHECKER/SUPERVISOR */}
-{/* {(['CHECKER','SUPERVISOR'].includes(userRole)) && (item.submissions?.length > 0 || item.latest_submission) && (
-  (() => {
-    const latest =
-      item.latest_submission ||
-      [...(item.submissions || [])].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
-
-    const rawUrl = latest?.maker_media || latest?.media || latest?.photo || latest?.image;
-    const photoUrl = rawUrl
-      ? (rawUrl.startsWith('http') ? rawUrl : `https://konstruct.world${rawUrl}`)
-      : null;
-
-    return (
-      <div
-        className="mb-4 p-3 rounded-lg"
-        style={{ background: `${themeConfig.success}10`, border: `1px solid ${themeConfig.success}30` }}
-      >
-        <div className="text-sm font-semibold mb-1" style={{ color: themeConfig.textPrimary }}>
-          Latest Maker Submission
-        </div>
-        <div className="text-sm mb-2" style={{ color: themeConfig.textPrimary }}>
-          {latest?.maker_remarks || 'No remarks provided by Maker.'}
-        </div>
-        {photoUrl && (
-          <img
-            src={photoUrl}
-            alt="Maker submission"
-            className="w-40 h-28 object-cover rounded border cursor-zoom-in"
-            style={{ borderColor: themeConfig.success }}
-            onClick={() => window.open(photoUrl, '_blank')}
-          />
-        )}
-      </div>
-    );
-  })()
-)} */}
+                </div>
 
 {/* Unified submission preview for all roles (maker/checker/supervisor) */}
 {(['CHECKER','SUPERVISOR','MAKER'].includes(userRole)) &&
@@ -3241,53 +2818,7 @@ useEffect(() => {
 
 
 
-                {/* Expandable Options Section */}
-                {/* {item.options && item.options.length > 0 && (
-                    <div className="mt-3">
-                        <button
-                            onClick={() => setIsExpanded(!isExpanded)}
-                            className="flex items-center gap-2 text-sm font-medium"
-                            style={{ color: themeConfig.accent }}
-                        >
-                            <span>View Options ({item.options.length})</span>
-                            <span className={`transform transition-transform ${isExpanded ? 'rotate-90' : ''}`}>▶</span>
-                        </button>
-
-                        {isExpanded && (
-                            <div className="mt-3 space-y-2">
-                                {item.options.map((option, index) => (
-                                    <div
-                                        key={option.id}
-                                        className="p-3 rounded-lg"
-                                        style={{
-                                            background: option.choice === 'P'
-                                                ? `${themeConfig.success}15`
-                                                : `${themeConfig.error}15`,
-                                            border: `1px solid ${option.choice === 'P'
-                                                ? themeConfig.success + '30'
-                                                : themeConfig.error + '30'}`
-                                        }}
-                                    >
-                                        <div className="flex items-center justify-between">
-                                            <span className="font-medium" style={{ color: themeConfig.textPrimary }}>
-                                                {option.name}
-                                            </span>
-                                            <span
-                                                className="text-xs px-2 py-1 rounded-full font-bold"
-                                                style={{
-                                                    background: option.choice === 'P' ? themeConfig.success : themeConfig.error,
-                                                    color: 'white'
-                                                }}
-                                            >
-                                                {option.choice === 'P' ? '✓ PASS' : '✗ FAIL'}
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                )} */}
+               
             </div>
         );
     };
@@ -3517,72 +3048,6 @@ useEffect(() => {
     };
 
 
-    // Inspection Item Component
-//     const InspectionItem = React.memo(({ item, itemIndex, userRole, themeConfig }) => {
-//         const [isItemExpanded, setIsItemExpanded] = useState(false);
-//         const [selectedOptionId, setSelectedOptionId] = useState(null);
-//         const [remark, setRemark] = useState('');
-//         const [isSubmitting, setIsSubmitting] = useState(false);
-//         // In InspectionItem, add state for photo and error
-//         // const [photo, setPhoto] = useState(null);
-//         const [photos, setPhotos] = useState([]);
-
-//         const [showError, setShowError] = useState(false);
-//         //new added by atharva 12.08.2025
-//         // Pick the latest maker attempt (or latest submission if none has maker fields)
-// const latestMakerSubmission = React.useMemo(() => {
-//   const subs = Array.isArray(item.submissions) ? item.submissions : [];
-//   if (!subs.length) return null;
-
-//   // Prefer submissions that actually contain maker fields
-//   const makerish = subs.filter(
-//     s => s.maker_id || s.maker_remarks || s.maker_media || s.maker_at
-//   );
-//   const pickFrom = makerish.length ? makerish : subs.slice();
-
-//   // Sort by attempts, then created_at
-//   pickFrom.sort((a, b) => {
-//     const aA = a.attempts ?? 0;
-//     const bA = b.attempts ?? 0;
-//     if (aA !== bA) return aA - bA;
-//     const ad = new Date(a.created_at || 0).getTime();
-//     const bd = new Date(b.created_at || 0).getTime();
-//     return ad - bd;
-//   });
-
-//   return pickFrom[pickFrom.length - 1] || null;
-// }, [item.submissions]);
-
-
-//         // Check if this role can make decisions
-//         const canMakeDecisions = ['CHECKER', 'SUPERVISOR', 'MAKER'].includes(userRole);
-
-//         // Handle option selection
-//         const handleOptionSelect = (optionId) => {
-//             if (!canMakeDecisions) return;
-//             setSelectedOptionId(optionId);
-//         };
-
-//         // Validation logic
-//         const isPhotoRequired = item.photo_required;
-//         const isMaker = userRole === "MAKER";
-//         const isChecker = userRole === "CHECKER";
-//         const isSupervisor = userRole === "SUPERVISOR";
-
-//        const validate = () => {
-//   if (isMaker) {
-//     if (!remark) return "Remarks are required for Maker";
-//     if (isPhotoRequired && photos.length === 0) return "Photo is required for Maker";
-//   }
-//   if (isChecker) {
-//     // if photos are mandatory for checker when required:
-//     if (isPhotoRequired && photos.length === 0) return "Photo is required for Checker";
-//   }
-//   if (isSupervisor) {
-//     if (isPhotoRequired && photos.length === 0) return "Photo is required for Supervisor";
-//   }
-//   return null;
-// };
 
 
 const InspectionItem = React.memo(({ item, itemIndex, userRole, themeConfig }) => {
@@ -3683,30 +3148,7 @@ const canMakeDecisions = isChecker || isSupervisor || isMaker;
           setLoadingStates(prev => new Set([...prev, item.id]));
           try {
             const token = localStorage.getItem("ACCESS_TOKEN");
-            // let apiEndpoint, payload, formData;
-            // if (isMaker) {
-            //   apiEndpoint = '/mark-as-done-maker/';
-            //   formData = new FormData();
-            //   formData.append('checklist_item_id', item.id);
-            //   formData.append('maker_remark', remark);
-            //   if (photo) formData.append('maker_media', photo);
-            // } else if (isChecker) {
-            //   apiEndpoint = '/Decsion-makeing-forSuer-Inspector/';
-            //   formData = new FormData();
-            //   formData.append('checklist_item_id', item.id);
-            //   formData.append('role', 'checker');
-            //   if (selectedOptionId) formData.append('option_id', selectedOptionId);
-            //   if (remark) formData.append('check_remark', remark);
-            //   if (photo) formData.append('inspector_photo', photo);
-            // } else if (isSupervisor) {
-            //   apiEndpoint = '/Decsion-makeing-forSuer-Inspector/';
-            //   formData = new FormData();
-            //   formData.append('checklist_item_id', item.id);
-            //   formData.append('role', 'supervisor');
-            //   if (selectedOptionId) formData.append('option_id', selectedOptionId);
-            //   if (remark) formData.append('supervisor_remarks', remark);
-            //   if (photo) formData.append('reviewer_photo', photo);
-            // }
+         
             let apiEndpoint, formData;
 if (isMaker) {
   apiEndpoint = MAKER_DONE_API
@@ -3795,25 +3237,7 @@ if (isMaker) {
                     <div className="flex items-center justify-between">
                         <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
-                                {/* Bulk selection checkbox for CHECKER/SUPERVISOR */}
-                                {/* {['CHECKER', 'SUPERVISOR'].includes(userRole) && (
-                                    <div className="flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedItemsForBulk.has(item.id)}
-                                            onChange={(e) => {
-                                                e.stopPropagation(); // Prevent expanding item when clicking checkbox
-                                                toggleItemSelection(item.id);
-                                            }}
-                                            disabled={bulkSubmitting}
-                                            className="w-4 h-4 rounded border-2 focus:ring-2 cursor-pointer disabled:opacity-50"
-                                            style={{
-                                                accentColor: themeConfig.accent,
-                                                borderColor: themeConfig.border
-                                            }}
-                                        />
-                                    </div>
-                                )} */}
+                               
                                 {/* Bulk selection checkbox for CHECKER only */}
                                 {userRole === 'CHECKER' && (
                                     <div className="flex items-center">
@@ -3945,32 +3369,7 @@ if (isMaker) {
                         }`}
                 >
                     <div className="px-4 pb-4">
-                        {/* Item Description */}
-                        {/* {item.description && (
-                            <div
-                                className="p-4 rounded-xl mb-4"
-                                style={{
-                                    background: `${themeConfig.textSecondary}08`,
-                                    border: `1px solid ${themeConfig.textSecondary}20`
-                                }}
-                            >
-                                <h6
-                                    className="font-medium text-sm mb-2 flex items-center gap-2"
-                                    style={{ color: themeConfig.textPrimary }}
-                                >
-                                    <span>📝</span>
-                                    Description
-                                </h6>
-                                <p className="text-sm" style={{ color: themeConfig.textSecondary }}>
-                                    {item.description}
-                                </p>
-                            </div>
-                        )} */}
-
-                        {/* Options Section */}
-                        {/* Options Section - Hidden for MAKER */}
-                        {/* newly adde by atharva 12.08.2025  */}
-                        {/* Maker submission panel for CHECKER/SUPERVISOR */}
+                       
 {(userRole === "CHECKER" || userRole === "SUPERVISOR") && latestMakerSubmission && (
   <div
     className="p-4 rounded-xl mb-4"
@@ -4040,42 +3439,6 @@ if (isMaker) {
     </div>
   </div>
 )}
-{/* Latest Maker Submission for CHECKER/SUPERVISOR */}
-{/* {(['CHECKER','SUPERVISOR'].includes(userRole)) && (item.submissions?.length > 0 || item.latest_submission) && (
-  (() => {
-    const latest =
-      item.latest_submission ||
-      [...(item.submissions || [])].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
-
-    const rawUrl = latest?.maker_media || latest?.media || latest?.photo || latest?.image;
-    const photoUrl = rawUrl
-      ? (rawUrl.startsWith('http') ? rawUrl : `https://konstruct.world${rawUrl}`)
-      : null;
-
-    return (
-      <div
-        className="mb-4 p-3 rounded-lg"
-        style={{ background: `${themeConfig.success}10`, border: `1px solid ${themeConfig.success}30` }}
-      >
-        <div className="text-sm font-semibold mb-1" style={{ color: themeConfig.textPrimary }}>
-          Latest Maker Submission
-        </div>
-        <div className="text-sm mb-2" style={{ color: themeConfig.textPrimary }}>
-          {latest?.maker_remarks || 'No remarks provided by Maker.'}
-        </div>
-        {photoUrl && (
-          <img
-            src={photoUrl}
-            alt="Maker submission"
-            className="w-40 h-28 object-cover rounded border cursor-zoom-in"
-            style={{ borderColor: themeConfig.success }}
-            onClick={() => window.open(photoUrl, '_blank')}
-          />
-        )}
-      </div>
-    );
-  })()
-)} */}
 
 
 {/* Unified submission preview for all roles (maker/checker/supervisor) */}
@@ -4442,29 +3805,7 @@ if (isMaker) {
     </div>
   </>
 )}
-{/* 
-  <div className="flex flex-wrap gap-2 mt-2">
-    {photos.map((f, i) => (
-      <div key={i} className="relative">
-        <img
-          src={URL.createObjectURL(f)}
-          alt={`preview-${i}`}
-          className="w-24 h-16 object-cover rounded border"
-        />
-        <button
-          type="button"
-          onClick={() =>
-            setPhotos(prev => prev.filter((_, idx) => idx !== i))
-          }
-          className="absolute -top-2 -right-2 w-6 h-6 rounded-full text-white text-xs"
-          style={{ background: '#ef4444' }}
-          aria-label="Remove image"
-        >
-          ×
-        </button>
-      </div>
-    ))}
-  </div> */}
+
 
 
 
@@ -4657,20 +3998,7 @@ if (isMaker) {
 
     } 
 
-    // catch (err) {
-    //     console.error("❌ Failed to submit MAKER work:", err);
-    //     const errorMessage = err.response?.data?.detail || "Failed to submit work";
-
-    //     toast.error(`❌ ${errorMessage}`, {
-    //         duration: 4000,
-    //         style: {
-    //             background: themeConfig.error,
-    //             color: 'white',
-    //             borderRadius: '12px',
-    //             padding: '16px',
-    //         },
-    //     });
-    // } 
+   
     catch (err) {
     const errorMessage = err.response?.data?.detail || "Failed to submit work";
     showToast(`❌ ${errorMessage}`, "error");
@@ -4687,13 +4015,7 @@ const handleRemarkChange = (itemId, value) => {
   }));
 };
 
-// const handlePhotoChange = (itemId, file) => {
-//   setMakerInputs(inputs => ({
-//     ...inputs,
-//     [itemId]: { ...(inputs[itemId] || {}), photo: file }
-//   }));
-// };
-// Multiple files per item
+
 const handlePhotosChange = (itemId, newFiles) => {
   setMakerInputs(prev => {
     const current = prev[itemId]?.photos || [];
@@ -4707,55 +4029,6 @@ const handlePhotosChange = (itemId, newFiles) => {
   });
 };
 
-
-// const handleSubmitItem = async (item) => {
-//   const input = makerInputs[item.id] || {};
-//   if (!input.remark || !input.remark.trim()) {
-//     toast.error("Remark is required.");
-//     return;
-//   }
-//   if (item.photo_required && !input.photo) {
-//     toast.error("Photo is required for this question.");
-//     return;
-//   }
-
-//   setMakerInputs(inputs => ({
-//     ...inputs,
-//     [item.id]: { ...(inputs[item.id] || {}), submitting: true }
-//   }));
-
-//   try {
-//     const token = localStorage.getItem("ACCESS_TOKEN");
-//     const formData = new FormData();
-//     formData.append("checklist_item_id", item.id);
-//     formData.append("maker_remark", input.remark);
-//     if (input.photo) {
-//       formData.append("maker_media", input.photo);
-//     }
-//     await checklistInstance.post(
-//       '/mark-as-done-maker/',
-//       formData,
-//       {
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//           'Content-Type': 'multipart/form-data'
-//         },
-//       }
-//     );
-//     toast.success("Submitted!");
-//     // Optionally: disable further editing/submission for this question
-//     setMakerInputs(inputs => ({
-//       ...inputs,
-//       [item.id]: { ...inputs[item.id], submitting: false, done: true }
-//     }));
-//   } catch (err) {
-//     toast.error("Failed to submit: " + (err.response?.data?.detail || "Error"));
-//     setMakerInputs(inputs => ({
-//       ...inputs,
-//       [item.id]: { ...inputs[item.id], submitting: false }
-//     }));
-//   }
-// };
 
 
 
@@ -4809,122 +4082,6 @@ const handleSubmitItem = async (item) => {
 
 
 
-
-
-
-  //   const handleMakerPhotoUpload = (event) => {
-  //       const file = event.target.files[0]; // Single file only
-  //       if (file) {
-  //           const newPhoto = {
-  //               file,
-  //               preview: URL.createObjectURL(file),
-  //               name: file.name
-  //           };
-  //           setMakerPhotos([newPhoto]); // Replace existing photo
-  //       }
-  //   };
-
-  //   // Remove photo
-  //   const removeMakerPhoto = (index) => {
-  //       setMakerPhotos(prev => prev.filter((_, i) => i !== index));
-  //   };
-
-  //   // Submit MAKER work
-  //   const handleMakerSubmit = async () =>
-  // //     {
-  // // setShowError(false);
-
-  // // // 1. Validate
-  // // if (!makerRemark.trim()) {
-  // //   setShowError(true);
-  // //   toast.error("Remarks are required for Maker");
-  // //   return;
-  // // }
-  // // if (selectedItemForMaker.photo_required && makerPhotos.length === 0) {
-  // //   setShowError(true);
-  // //   toast.error("Photo is required for this item");
-  // //   return;
-  // // }
-    
-  //       {
-  //       if (!selectedItemForMaker) return;
-
-  //       setSubmittingMaker(true);
-
-  //       try {
-  //           const token = localStorage.getItem("ACCESS_TOKEN");
-
-  //           // Create FormData for photos
-  //           const formData = new FormData();
-  //           formData.append('checklist_item_id', selectedItemForMaker.id);
-  //           formData.append('maker_remark', makerRemark);
-
-  //           // Add single photo
-  //           if (makerPhotos.length > 0) {
-  //               formData.append('maker_media', makerPhotos[0].file); // Single photo as maker_media
-  //           }
-
-  //           console.log("📡 API CALL: MAKER Submit - Endpoint:", '/mark-as-done-maker/');
-  //           console.log("📡 API CALL: MAKER Submit - Item ID:", selectedItemForMaker.id);
-
-  //           const response = await checklistInstance.post(
-  //               '/mark-as-done-maker/',
-  //               formData,
-  //               {
-  //                   headers: {
-  //                       Authorization: `Bearer ${token}`,
-  //                       'Content-Type': 'multipart/form-data'
-  //                   },
-  //               }
-  //           );
-
-  //           console.log("📡 API RESPONSE: MAKER Submit - Response:", response.data);
-
-  //           if (response.status === 200) {
-  //               toast.success("✅ Work completed and submitted for review!", {
-  //                   duration: 4000,
-  //                   style: {
-  //                       background: themeConfig.success,
-  //                       color: 'white',
-  //                       borderRadius: '12px',
-  //                       padding: '16px',
-  //                   },
-  //               });
-
-  //               // Remove item from current tab immediately
-  //               // Remove item from current tab immediately
-  //               const submittedItemId = selectedItemForMaker.id;
-  //               const currentDataSource = activeWorkTab === 'available-work' ? 'available_for_me' : 'assigned_to_me';
-
-  //               setChecklistData(prev => prev.map(roomData => ({
-  //                   ...roomData,
-  //                   [currentDataSource]: roomData[currentDataSource]?.filter(item => item.id !== submittedItemId) || []
-  //               })));
-
-  //               // Close modal and reset
-  //               setShowMakerModal(false);
-  //               setSelectedItemForMaker(null);
-  //               setMakerRemark('');
-  //               setMakerPhotos([]);
-  //           }
-
-  //       } catch (err) {
-  //           console.error("❌ Failed to submit MAKER work:", err);
-  //           const errorMessage = err.response?.data?.detail || "Failed to submit work";
-
-  //           toast.error(`❌ ${errorMessage}`, {
-  //               duration: 4000,
-  //               style: {
-  //                   background: themeConfig.error,
-  //                   color: 'white',
-  //                   borderRadius: '12px',
-  //                   padding: '16px',
-  //               },
-  //           });
-  //       } finally {
-  //           setSubmittingMaker(false);
-  //       }
-  //   };
 
     const handleRoomClick = (room) => {
         setSelectedRoom(room);
@@ -5179,84 +4336,7 @@ const parsePageFromUrl = (url, fallbackLimit = 10) => {
     return { limit: fallbackLimit, offset: 0, page: 1 };
   }
 };
-// useEffect(() => {
-//   if (!projectId) return;
 
-//   const fetchCategories = async () => {
-//     try {
-//       const token = localStorage.getItem("ACCESS_TOKEN");
-
-//       // If you already have projectInstance with base https://konstruct.world/projects
-//       const res = await projectInstance.get(
-//   "https://konstruct.world/projects/categories-simple",
-//   {
-//     headers: { Authorization: `Bearer ${token}` },
-//   }
-// );
-
-
-//       const all = res.data || [];
-
-//       // 🔹 Filter only current project categories
-//       const forThisProject = all.filter(
-//         (cat) => String(cat.project) === String(projectId)
-//       );
-
-//       setProjectCategories(forThisProject);
-
-//       // 🔹 Use just names in your dropdown
-//       const names = forThisProject
-//         .map((c) => c.name)
-//         .filter(Boolean)
-//         .sort((a, b) => String(a).localeCompare(String(b)));
-
-//       setCategoryOptions(names);
-//     } catch (err) {
-//       console.error("❌ Failed to load project categories:", err);
-//       // Optional: keep fallback from checklist-derived categories
-//     }
-//   };
-
-//   fetchCategories();
-// }, [projectId]);
-// useEffect(() => {
-//   if (!projectId) return;
-
-//   const fetchCategories = async () => {
-//     try {
-//       const token = localStorage.getItem("ACCESS_TOKEN");
-
-//       // ✅ NOTE: /projects/categories-simple/ (NOT /api/categories-simple/)
-//       const res = await projectInstance.get("/categories-simple/", {
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//         },
-//       });
-
-//       const all = res.data || [];
-
-//       // 🔹 Filter by current project
-//       const forThisProject = all.filter(
-//         (cat) => String(cat.project) === String(projectId)
-//       );
-
-//       // store full objects if you want later
-//       // setProjectCategories(forThisProject);
-
-//       // 🔹 Just names for dropdown
-//       const names = forThisProject
-//         .map((c) => c.name)
-//         .filter(Boolean)
-//         .sort((a, b) => String(a).localeCompare(String(b)));
-// console.log("hello",forThisProject)
-//       setCategoryOptions(names);
-//     } catch (err) {
-//       console.error("❌ Failed to load project categories:", err);
-//     }
-//   };
-
-//   fetchCategories();
-// }, [projectId]);
 
 useEffect(() => {
   if (!projectId) {
@@ -5313,39 +4393,7 @@ useEffect(() => {
   fetchCategories();
 }, [projectId]);
 
-// const applyPageResponse = (data) => {
-//   const { next, previous, count, results } = data || {};
-//   let { limit, offset, page } = pageState;
 
-//   if (previous) {
-//     const p = parsePageFromUrl(previous, limit);
-//     limit = p.limit;
-//     offset = p.offset + p.limit;
-//     page = p.page + 1;
-//   } else if (next) {
-//     const n = parsePageFromUrl(next, limit);
-//     limit = n.limit;
-//     offset = Math.max(n.offset - n.limit, 0);
-//     page = Math.floor(offset / n.limit) + 1;
-//   } else {
-//     limit = limit || (results?.length ?? 10);
-//     offset = 0;
-//     page = 1;
-//   }
-
-//   // Replace current page items
-//   // setChecklistData(results || []);
-//   // setSelectedItemsForBulk(new Set()); // clear bulk selections on page change
-//   setTabData(prev => ({
-//     ...prev,
-//     [activeTab]: results || []
-//   }));
-//   setSelectedItemsForBulk(new Set());
-
-//   setPageState({ next, previous, count: count || 0, limit, offset, page });
-// };
-// Apply a paged response to the right place (initializer tabs OR working-roles list)
-// 🚩 Pagination response apply karne ka central helper
 const applyPageResponse = (data, opts = {}) => {
   const {
     target = userRole === "INITIALIZER" ? "initializer" : "work",
@@ -5441,85 +4489,6 @@ const loadInitializerPage = async ({
   }
 };
 
-
-// Load a page for CHECKER/MAKER/SUPERVISOR (rooms are paged)
-// const loadWorkPage = async ({ limit = pageState.limit || 10, offset = 0 } = {}) => {
-//   if (!projectId || !flatId) return;
-//   setPageLoading(true);
-//   try {
-//     const token = localStorage.getItem("ACCESS_TOKEN");
-
-//     // 👇 derive role_id from FLOW_ROLE (CHECKER / MAKER / SUPERVISOR)
-//     const roleParam = userRole ? userRole.toLowerCase() : null;
-
-//     const params = {
-//       project_id: projectId,
-//       flat_id: flatId,
-//       limit,
-//       offset,
-//       ...(roleParam ? { role_id: roleParam } : {}),
-//     };
-
-//     console.log("⬆️ loadWorkPage params:", params);
-
-//     const res = await checklistInstance.get(CHECKLIST_API_URL, {
-//       params,
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//         "Content-Type": "application/json",
-//       },
-//     });
-
-//     applyPageResponse(res.data, { target: "work", limit, offset });
-//     setNoteMessage(prev => prev ?? res.data?.note ?? null);
-
-//     const roomIds = [
-//       ...new Set((res.data.results || []).map(r => r.room_id).filter(Boolean)),
-//     ];
-//     if (roomIds.length) await fetchRoomDetails(roomIds);
-//   } finally {
-//     setPageLoading(false);
-//   }
-// };
-// const loadWorkPage = async ({ limit = pageState.limit || 10, offset = 0 } = {}) => {
-//   if (!projectId || !flatId) return;
-
-//   setPageLoading(true);
-//   try {
-//     const token = localStorage.getItem("ACCESS_TOKEN");
-
-//     // FLOW_ROLE ya userRole se derive karo
-//     const flowRole = localStorage.getItem("FLOW_ROLE"); // "CHECKER", "MAKER", "SUPERVISOR"
-//     const roleParam = (flowRole || userRole || "").toLowerCase() || null;
-
-//     const params = {
-//       project_id: projectId,
-//       flat_id: flatId,
-//       limit,
-//       offset,
-//       ...(roleParam ? { role_id: roleParam } : {}),
-//     };
-
-//     console.log("⬆️ loadWorkPage params:", params);
-
-//     const res = await checklistInstance.get(CHECKLIST_API_URL, {
-//       params,
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//         "Content-Type": "application/json",
-//       },
-//     });
-
-//     console.log(
-//       "🔍 DEBUG: Working role data received:",
-//       res.data?.results || res.data
-//     );
-
-//     applyPageResponse(res.data, { target: "work", limit, offset });
-//   } finally {
-//     setPageLoading(false);
-//   }
-// };
 const loadWorkPage = async ({ offset = 0, limit } = {}) => {
   if (!projectId || !flatId) return;
 
@@ -5586,69 +4555,6 @@ useEffect(() => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [userRole, activeTab, projectId, flatId]);
 
-// useEffect(() => {
-//   if (!projectId || !flatId) return;
-
-//   if (isChecker || isMaker || isSupervisor) {
-//     // 👉 Checker’s working page
-//     loadWorkPage({});
-//   }
-
-//   if (isInitializerRole) {
-//     // 👉 Only initializer should fetch initializer tab data
-//     loadInitializerPage({ tabKey: activeTab });
-//   }
-// }, [projectId, flatId, activeTab, flowRole]);
-
-
-// const loadWorkPage = async ({ limit = pageState.limit || 10, offset = 0 } = {}) => {
-//   if (!projectId || !flatId) return;
-//   setPageLoading(true);
-//   try {
-//     const token = localStorage.getItem("ACCESS_TOKEN");
-//     const params = { project_id: projectId, flat_id: flatId, limit, offset };
-//     // const res = await checklistInstance.get('/Transafer-Rule-getchchklist/', {
-//     //   params,
-//     //   headers: { Authorization: `Bearer ${token}` },
-//     // });
-//     const res = await checklistInstance.get(CHECKLIST_API_URL, {
-//     params: { project_id: projectId, flat_id: flatId, limit: 10, offset: 0 },
-//     headers: {
-//         Authorization: `Bearer ${token}`,
-//         "Content-Type": "application/json",
-//     },
-// });
-
-
-//     applyPageResponse(res.data, { target: 'work', limit, offset });
-//     setNoteMessage(prev => prev ?? res.data?.note ?? null);
-
-
-//     const roomIds = [...new Set((res.data.results || []).map(r => r.room_id).filter(Boolean))];
-//     if (roomIds.length) await fetchRoomDetails(roomIds);
-//   } finally {
-//     setPageLoading(false);
-//   }
-// };
-
-
-// const fetchByUrl = async (url) => {
-//   if (!url) return;
-//   setPageLoading(true);
-//   try {
-//     const token = localStorage.getItem("ACCESS_TOKEN");
-//     const res = await checklistInstance.get(url, {
-//       headers: { Authorization: `Bearer ${token}` },
-//     });
-//     applyPageResponse(res.data);
-//   } catch (e) {
-//     toast.error("Failed to load page", {
-//       style: { background: themeConfig.error, color: "white", borderRadius: "12px" },
-//     });
-//   } finally {
-//     setPageLoading(false);
-//   }
-// };
 const fetchByUrl = async (url) => {
   if (!url) return;
   setPageLoading(true);
@@ -5689,123 +4595,7 @@ const handlePrevPage = () => {
 const handleNextPage = () => {
   if (pageState.next && !pageLoading) fetchByUrl(pageState.next);
 };
-// const handleGenerateReport = async (filters) => {
-//   setReportLoading(true);
-//   setReportError(null);
 
-//   try {
-//     const token = localStorage.getItem("ACCESS_TOKEN");
-
-//     const params = {
-//       from_date: filters.fromDate || undefined,
-//       to_date: filters.toDate || undefined,
-//       with_photos: filters.includePhotos ? "true" : "false",
-//       category: filters.category || undefined,
-//       decision_role: filters.decisionRole || undefined,
-//       outcome: filters.outcome || undefined,
-//       stage_id: filters.stageId || stageId || undefined, // fallback to derived stageId
-//     };
-
-//     const res = await NEWchecklistInstance.get(
-//       `/flat-report/${flatId}/`,
-//       {
-//         params,
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//         },
-//         timeout: 60000,
-//       }
-//     );
-
-//     const data = res.data || {};
-//     setReportData(data);
-
-//     if (data.pdf_url) {
-//       const url = data.pdf_url.startsWith("http")
-//         ? data.pdf_url
-//         : `https://konstruct.world${data.pdf_url}`;
-//       window.open(url, "_blank");
-//     } else {
-//       toast.error("Report generated but pdf_url missing from response");
-//     }
-//   } catch (err) {
-//     console.error("❌ Report generation failed:", err);
-//     const msg =
-//       err.response?.data?.detail ||
-//       err.response?.data?.error ||
-//       err.message ||
-//       "Failed to generate report";
-//     setReportError(msg);
-//     toast.error(`❌ ${msg}`);
-//   } finally {
-//     setReportLoading(false);
-//     setShowReportFilter(false);
-//   }
-// };
-// const handleGenerateReport = async (filters) => {
-//   setReportLoading(true);
-//   setReportError(null);
-
-//   try {
-//     const token = localStorage.getItem("ACCESS_TOKEN");
-
-//     // 🔹 Params exactly popup ke according
-//     const params = {};
-
-//     if (filters.fromDate) params.from_date = filters.fromDate;
-//     if (filters.toDate) params.to_date = filters.toDate;
-
-//     // boolean → string (backend-friendly)
-//     params.with_photos = filters.includePhotos ? "true" : "false";
-
-//     if (filters.category) params.category = filters.category;
-//     if (filters.decisionRole) params.decision_role = filters.decisionRole;
-//     if (filters.outcome) params.outcome = filters.outcome;
-//     if (filters.stageId) params.stage_id = filters.stageId;
-
-//     // optional: agar backend yeh bhi leta ho GET me to helpful hai
-//     params.project_id = projectId;
-//     params.flat_id = flatId;
-
-//     console.log("📄 Report filters →", filters);
-//     console.log("📄 API params →", params);
-
-//     const res = await NEWchecklistInstance.get(
-//       `/flat-report/${flatId}/`,
-//       {
-//         params,
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//         },
-//         timeout: 60000,
-//       }
-//     );
-
-//     const data = res.data || {};
-//     setReportData(data);
-
-//     if (data.pdf_url) {
-//       const url = data.pdf_url.startsWith("http")
-//         ? data.pdf_url
-//         : `https://konstruct.world${data.pdf_url}`;
-//       window.open(url, "_blank");
-//     } else {
-//       toast.error("Report generated but pdf_url missing from response");
-//     }
-//   } catch (err) {
-//     console.error("❌ Report generation failed:", err);
-//     const msg =
-//       err.response?.data?.detail ||
-//       err.response?.data?.error ||
-//       err.message ||
-//       "Failed to generate report";
-//     setReportError(msg);
-//     toast.error(`❌ ${msg}`);
-//   } finally {
-//     setReportLoading(false);
-//     setShowReportFilter(false);
-//   }
-// };
 const handleGenerateReport = async (filters) => {
   setReportLoading(true);
   setReportError(null);
@@ -5880,20 +4670,7 @@ const handleGenerateReport = async (filters) => {
   }
 };
 
-// const buildReportQuery = (filters = {}) => {
-//   const params = new URLSearchParams();
 
-//   if (filters.fromDate) params.set("from_date", filters.fromDate);
-//   if (filters.toDate) params.set("to_date", filters.toDate);
-
-//   if (filters.includePhotos) params.set("with_photos", "true");
-//   if (filters.category) params.set("category", filters.category);
-//   if (filters.decisionRole) params.set("decision_role", filters.decisionRole);
-//   if (filters.outcome) params.set("outcome", filters.outcome);
-//   if (filters.stageId) params.set("stage_id", String(filters.stageId));
-
-//   return params.toString();
-// };
 const buildReportQuery = (filters = {}) => {
   const params = new URLSearchParams();
 
@@ -5957,155 +4734,7 @@ const onOverviewClick = () => {
   setShowOverviewFilter(true);
 };
 
-// const CHECKLIST_BASE = "https://konstruct.world/checklists";
 
-// async function handleDownloadOverview(flatId, filters, setLoading) {
-//   if (!flatId) return;
-
-//   try {
-//     setLoading(true);
-//     const token = localStorage.getItem("ACCESS_TOKEN");
-
-//     const qs = buildReportQuery(filters);
-//     const url = `${CHECKLIST_BASE}/flat-overview/${flatId}/${qs ? `?${qs}` : ""}`;
-
-//     const res = await NEWchecklistInstance.get(url, {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//       },
-//     });
-
-//     const data = res.data || {};
-
-//     if (data.pdf_url) {
-//       window.open(data.pdf_url, "_blank"); // ya location.href = data.pdf_url
-//     } else {
-//       toast.error("Overview PDF URL not found");
-//     }
-//   } catch (err) {
-//     console.error("Overview download error:", err);
-//     toast.error("Flat overview generate karte waqt error aaya");
-//   } finally {
-//     setLoading(false);
-//   }
-// }
-// const [overviewLoading, setOverviewLoading] = useState(false);
-
-// // ...
-// // const onOverviewClick = () => {
-// //   handleDownloadOverview(flatId, lastReportFilters || {}, setOverviewLoading);
-// // };
-// // const onOverviewClick = () => {
-// //   handleDownloadOverview(flatId, filters, setOverviewLoading);
-// // };
-// const onOverviewClick = () => {
-//   handleDownloadOverview(flatId, lastReportFilters || {}, setOverviewLoading);
-// };
-
-// const handleGenerateReport = async (filters) => {
-//   setReportLoading(true);
-//   setReportError(null);
-
-//   try {
-//     const token = localStorage.getItem("ACCESS_TOKEN");
-
-//     const params = new URLSearchParams({
-//       from_date: filters.fromDate || "",
-//       to_date: filters.toDate || "",
-//       with_photos: filters.includePhotos ? "true" : "false",
-//       category: filters.category || "",
-//       stage_id: stageId ? String(stageId) : "",
-//     });
-
-//     const url = `https://konstruct.world/checklists/flat-report/${flatId}/?${params.toString()}`;
-
-//     const res = await fetch(url, {
-//       method: "GET",
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//       },
-//     });
-
-//     if (!res.ok) {
-//       throw new Error(`HTTP ${res.status}`);
-//     }
-
-//     const data = await res.json();
-//     setReportData(data);
-
-//     if (data.pdf_url) {
-//       const pdfUrl = data.pdf_url.startsWith("http")
-//         ? data.pdf_url
-//         : `https://konstruct.world${data.pdf_url}`;
-//       window.open(pdfUrl, "_blank");
-//     } else {
-//       toast.error("Report generated but pdf_url missing from response");
-//     }
-//   } catch (err) {
-//     console.error("❌ Report generation failed:", err);
-//     setReportError(err.message || "Failed to generate report");
-//     toast.error(`❌ ${err.message || "Failed to generate report"}`);
-//   } finally {
-//     setReportLoading(false);
-//     setShowReportFilter(false);
-//   }
-// };
-
-// const handleGenerateReport = async (filters) => {
-//   setReportLoading(true);
-//   setReportError(null);
-
-//   try {
-//     const token = localStorage.getItem("ACCESS_TOKEN");
-
-//     // ✅ yahan pe flat + project + filters bhejte hain
-//     const payload = {
-//       project_id: projectId,
-//       flat_id: flatId,
-//       // stage backend ko chahiye to direct bhej do
-//       stage_id: stageId || null,
-
-//       // filters from modal
-//       status: filters.status || null,           // not_started / in_progress / completed / etc
-//       category: filters.category || null,       // text / slug
-//       from_date: filters.fromDate || null,      // "YYYY-MM-DD"
-//       to_date: filters.toDate || null,          // "YYYY-MM-DD"
-//       include_photos: filters.includePhotos,    // true/false
-//     };
-
-//     const res = await NEWchecklistInstance.post(FLAT_REPORT_API, payload, {
-//   headers: {
-//     Authorization: `Bearer ${token}`,
-//     "Content-Type": "application/json",
-//   },
-//   timeout: 60000,
-// });
-
-
-//     const data = res.data || {};
-//     setReportData(data);
-
-//     if (data.pdf_url) {
-//       const url = data.pdf_url.startsWith("http")
-//         ? data.pdf_url
-//         : `https://konstruct.world${data.pdf_url}`;
-//       window.open(url, "_blank");
-//     } else {
-//       toast.error("Report generated but pdf_url missing from response");
-//     }
-//   } catch (err) {
-//     console.error("❌ Report generation failed:", err);
-//     const msg =
-//       err.response?.data?.detail ||
-//       err.response?.data?.error ||
-//       "Failed to generate report";
-//     setReportError(msg);
-//     toast.error(`❌ ${msg}`);
-//   } finally {
-//     setReportLoading(false);
-//     setShowReportFilter(false);
-//   }
-// };
 
 
 const loadFirstPage = async () => {
@@ -6138,111 +4767,6 @@ const loadFirstPage = async () => {
 };
 
 
-
-
-// after all useState declarations
-
-// const [stageOptions, setStageOptions] = useState([]);
-// const [categoryOptions, setCategoryOptions] = useState([]);
-// 👉 clean getAnyStageId
-
-
-
-    // // Add after other useState declarations
-    // const [stageInfo, setStageInfo] = useState(null);
-    // const [stageInfoLoading, setStageInfoLoading] = useState(false);
-    // const [stageInfoError, setStageInfoError] = useState(null);
-
-    // Helper to get stage_id from any checklist (first found)
-    // 👉 REPLACE your current getAnyStageId with this
-
-
-    
-    
-// const getAnyStageId = React.useCallback(() => {
-//   // INITIALIZER → stage_id is on checklists in tabData[activeTab]
-//   if (userRole === 'INITIALIZER') {
-//     const list = (tabData[activeTab] || []).flatMap(r => r.checklists || []);
-//     const c = list.find(x => x?.stage_id);
-//     return c?.stage_id ?? null;
-//   }
-
-
-// useEffect(() => {
-//   if (!stageId) {
-//     setStageInfo(null);
-//     setNoteMessage(null);
-//     return;
-//   }
-
-//   setStageInfoLoading(true);
-//   setStageInfoError(null);
-
-//   (async () => {
-//     try {
-//       const token = localStorage.getItem("ACCESS_TOKEN");
-//       const res = await projectInstance.get(`/stages/${stageId}/info/`, {
-//         headers: { Authorization: `Bearer ${token}` },
-//       });
-
-//       const data = res.data;
-//       setStageInfo(data);
-
-//       const stageNote =
-//         data?.note ??
-//         data?.stage_note ??
-//         data?.stage?.note ??
-//         data?.info?.note ??
-//         null;
-
-//       setNoteMessage(stageNote);
-//     } catch (err) {
-//       console.error("❌ Stage info fetch failed:", err);
-//       setStageInfoError(err.message || "Failed to fetch stage info");
-//       setNoteMessage(null);
-//     } finally {
-//       setStageInfoLoading(false);
-//     }
-//   })();
-// }, [stageId, projectInstance]);
-
-
-
-
-//   // derive stageId from current data (role/tab/checklists)
-// const stageId = useMemo(() => getAnyStageId(), [getAnyStageId]);
-
-
-//   // CHECKER / SUPERVISOR → stage_id is on checklists inside checklistData
-//   if (userRole === 'CHECKER' || userRole === 'SUPERVISOR') {
-//     const list = checklistData
-//       .flatMap(r => [...(r.available_for_me || []), ...(r.assigned_to_me || [])]);
-//     const c = list.find(x => x?.stage_id);
-//     return c?.stage_id ?? null;
-//   }
-
-  
-//   // MAKER → arrays contain items; try item.stage_id
-//   if (userRole === 'MAKER') {
-//     const list = checklistData
-//       .flatMap(r => [...(r.available_for_me || []), ...(r.assigned_to_me || [])]);
-//     const anyWithStage = list.find(x => x?.stage_id); // sometimes maker items are delivered as “items” or flattened
-//     if (anyWithStage?.stage_id) return anyWithStage.stage_id;
-
-//     // if “items” exist under checklists, scan them too
-//     const nested = list.flatMap(c => c?.items || []);
-//     const it = nested.find(i => i?.stage_id);
-//     return it?.stage_id ?? null;
-//   }
-
-//   return null;
-// }, [userRole, activeTab, tabData, checklistData]);
-
-// useEffect(() => {
-//   if (userRole === 'INITIALIZER') loadFirstPage();
-//   // else keep whatever fetching you already have for other roles
-//   // eslint-disable-next-line react-hooks/exhaustive-deps
-// }, [flatId, projectId, userRole]);
 
 
 useEffect(() => {
@@ -6387,199 +4911,6 @@ useEffect(() => {
 ]);
 
 
-
-// useEffect(() => {
-//   // role / project pata nahi to kuch mat karo
-//   if (!userRole || !projectId) return;
-
-//   const stageMap = new Map();    // stage_id -> stage_name
-//   const categoriesSet = new Set();
-
-//   // ---- Items se category + stage collect ----
-//   const collectFromItems = (items = []) => {
-//     items.forEach((item) => {
-//       // Category different fields se try karo
-//       const cat =
-//         item.category ||
-//         item.category_name ||
-//         item.category_label ||
-//         item.category_slug;
-
-//       if (cat) {
-//         categoriesSet.add(cat);
-//       }
-
-//       // Stage bhi item se nikal lo (agar diya ho)
-//       const sId = item.stage_id || item.stage?.id;
-//       const sName = item.stage_name || item.stage?.name;
-//       if (sId && sName) {
-//         stageMap.set(sId, sName);
-//       }
-//     });
-//   };
-
-//   // ---- Checklist level se stage + category collect ----
-//   const collectFromChecklists = (checklists = []) => {
-//     checklists.forEach((chk) => {
-//       // Stage
-//       const sId = chk.stage_id || chk.stage?.id;
-//       const sName = chk.stage_name || chk.stage?.name;
-//       if (sId && sName) {
-//         stageMap.set(sId, sName);
-//       }
-
-//       // Category agar checklist level pe ho
-//       const cat =
-//         chk.category ||
-//         chk.category_name ||
-//         chk.category_label ||
-//         chk.category_slug;
-
-//       if (cat) {
-//         categoriesSet.add(cat);
-//       }
-
-//       // Items me bhi dekh lo
-//       collectFromItems(chk.items || []);
-//     });
-//   };
-
-//   // -------- INITIALIZER (tabData se) --------
-//   if (userRole === "INITIALIZER") {
-//     const currentTabData = tabData[activeTab] || [];
-//     currentTabData.forEach((room) => {
-//       collectFromChecklists(room.checklists || []);
-//     });
-//   }
-
-//   // -------- WORKING ROLES (CHECKER / MAKER / SUPERVISOR) --------
-//   if (["CHECKER", "MAKER", "SUPERVISOR"].includes(userRole)) {
-//     const currentDataSource =
-//       activeWorkTab === "available-work"
-//         ? "available_for_me"
-//         : "assigned_to_me";
-
-//     (checklistData || []).forEach((room) => {
-//       collectFromChecklists(room[currentDataSource] || []);
-//     });
-//   }
-
-//   // -------- Extra: stageInfo se bhi ek entry daal do --------
-//   if (stageInfo?.stage_id && stageInfo?.stage_name) {
-//     stageMap.set(stageInfo.stage_id, stageInfo.stage_name);
-//   } else if (stageInfo?.stage?.id && stageInfo?.stage?.name) {
-//     // agar API nested object de rahi ho
-//     stageMap.set(stageInfo.stage.id, stageInfo.stage.name);
-//   }
-
-//   // Final arrays banaao (sorted, unique)
-//   const newStageOptions = Array.from(stageMap.entries())
-//     .map(([id, name]) => ({ id, name }))
-//     .sort((a, b) => String(a.name).localeCompare(String(b.name)));
-
-//   const newCategoryOptions = Array.from(categoriesSet).sort((a, b) =>
-//     String(a).localeCompare(String(b))
-//   );
-
-//   console.log("🔎 Built stageOptions:", newStageOptions);
-//   console.log("🔎 Built categoryOptions:", newCategoryOptions);
-
-//   setStageOptions(newStageOptions);
-//   setCategoryOptions(newCategoryOptions);
-// }, [
-//   userRole,
-//   projectId,
-//   activeTab,
-//   activeWorkTab,
-//   tabData,
-//   checklistData,
-//   stageInfo,
-// ]);
-
-// useEffect(() => {
-//   if (!userRole || !projectId || !flatId) return;
-
-//   // Reset to first page
-//   setPageState(ps => ({ ...ps, offset: 0, page: 1 }));
-
-//   if (userRole === 'INITIALIZER') {
-//     loadInitializerPage({ limit: pageState.limit || 10, offset: 0, tabKey: activeTab });
-//   } else if (['CHECKER','MAKER','SUPERVISOR'].includes(userRole)) {
-//     loadWorkPage({ limit: pageState.limit || 10, offset: 0 });
-//   }
-//   // eslint-disable-next-line react-hooks/exhaustive-deps
-// }, [userRole, activeTab, projectId, flatId]);
-
-// useEffect(() => {
-//   if (!stageId) {
-//     setStageInfo(null);
-//     setNoteMessage(null);
-//     return;
-//   }
-
-//   setStageInfoLoading(true);
-//   setStageInfoError(null);
-
-//   (async () => {
-//     try {
-//       const token = localStorage.getItem("ACCESS_TOKEN");
-
-//       // Use your axios instance if you have one for /projects
-//       // If you have `projectInstance` (base: https://konstruct.world/projects), prefer this:
-//       const res = await projectInstance.get(`/stages/${stageId}/info/`, {
-//         headers: { Authorization: `Bearer ${token}` }
-//       });
-
-//       const data = res.data;
-//       setStageInfo(data);
-
-//       // Pull the note from the stage info (covers several possible shapes)
-//       const stageNote =
-//         data?.note ??
-//         data?.stage_note ??
-//         data?.stage?.note ??
-//         data?.info?.note ??
-//         null;
-
-//       setNoteMessage(stageNote);
-//       console.log('✅ Stage info loaded:', { stageId, stageNote });
-//     } catch (err) {
-//       console.error('❌ Stage info fetch failed:', err);
-//       setStageInfoError(err.message || 'Failed to fetch stage info');
-//       setNoteMessage(null);
-//     } finally {
-//       setStageInfoLoading(false);
-//     }
-//   })();
-// }, [stageId]);
-
-    // Fetch stage info when stage_id changes
-    // useEffect(() => {
-    //   const stageId = getAnyStageId();
-    //   if (!stageId) return;
-    //   setStageInfoLoading(true);
-    //   setStageInfoError(null);
-    //   const token = localStorage.getItem("ACCESS_TOKEN");
-    //   fetch(`https://konstruct.world/projects/stages/${stageId}/info/`, {
-    //     headers: {
-    //       Authorization: `Bearer ${token}`,
-    //       'Content-Type': 'application/json',
-    //     },
-    //   })
-    //     .then(res => {
-    //       if (!res.ok) throw new Error('Failed to fetch stage info');
-    //       return res.json();
-    //     })
-    //     .then(data => {
-    //       setStageInfo(data);
-    //       setStageInfoLoading(false);
-    //     })
-    //     .catch(err => {
-    //       setStageInfoError(err.message);
-    //       setStageInfoLoading(false);
-    //     });
-    // // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [userRole, tabData, checklistData, activeTab]);
 
     if (loading) {
         return (
@@ -7220,254 +5551,6 @@ const OverviewFilterModal = ({
   );
 };
 
-//     const ReportFilterModal = ({ onClose, onApply, themeConfig, currentStage }) => {
-//   const [status, setStatus] = useState("all");
-//   const [category, setCategory] = useState("");
-//   const [fromDate, setFromDate] = useState("");
-//   const [toDate, setToDate] = useState("");
-//   const [includePhotos, setIncludePhotos] = useState(true);
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     onApply({
-//       status: status === "all" ? null : status,
-//       category: category.trim() || null,
-//       fromDate: fromDate || null,
-//       toDate: toDate || null,
-//       includePhotos,
-//     });
-//   };
-
-//   return (
-//     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-//       <div
-//         className="w-full max-w-lg rounded-2xl shadow-2xl"
-//         style={{
-//           background: themeConfig.cardBg,
-//           border: `1px solid ${themeConfig.border}`,
-//         }}
-//       >
-//         <form onSubmit={handleSubmit}>
-//           {/* Header */}
-//           <div
-//             className="px-6 py-4 border-b flex items-center justify-between"
-//             style={{ borderColor: themeConfig.border }}
-//           >
-//             <div>
-//               <h3
-//                 className="text-lg font-bold"
-//                 style={{ color: themeConfig.textPrimary }}
-//               >
-//                 Download Inspection Report
-//               </h3>
-//               <p
-//                 className="text-xs mt-1"
-//                 style={{ color: themeConfig.textSecondary }}
-//               >
-//                 Choose filters – report will be generated exactly as per these
-//                 selections.
-//               </p>
-//             </div>
-//             <button
-//               type="button"
-//               onClick={onClose}
-//               className="p-2 rounded-lg hover:bg-opacity-80 transition-all"
-//               style={{
-//                 background: `${themeConfig.error}20`,
-//                 color: themeConfig.error,
-//               }}
-//             >
-//               ✕
-//             </button>
-//           </div>
-
-//           {/* Body */}
-//           <div className="px-6 py-4 space-y-4">
-//             {/* Stage info – read-only pill */}
-//             {currentStage && (
-//               <div>
-//                 <label
-//                   className="block text-xs font-medium mb-1"
-//                   style={{ color: themeConfig.textSecondary }}
-//                 >
-//                   Stage
-//                 </label>
-//                 <div
-//                   className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
-//                   style={{
-//                     background: `${themeConfig.accent}20`,
-//                     color: themeConfig.accent,
-//                     border: `1px solid ${themeConfig.accent}`,
-//                   }}
-//                 >
-//                   {currentStage}
-//                 </div>
-//               </div>
-//             )}
-
-//             {/* Status filter */}
-//             <div>
-//               <label
-//                 className="block text-xs font-medium mb-1"
-//                 style={{ color: themeConfig.textSecondary }}
-//               >
-//                 Checklist Status
-//               </label>
-//               <select
-//                 value={status}
-//                 onChange={(e) => setStatus(e.target.value)}
-//                 className="w-full px-3 py-2 rounded-lg text-sm border"
-//                 style={{
-//                   background: themeConfig.cardBg,
-//                   color: themeConfig.textPrimary,
-//                   borderColor: themeConfig.border,
-//                 }}
-//               >
-//                 <option value="all">All</option>
-//                 <option value="not_started">Not Started</option>
-//                 <option value="in_progress">In Progress</option>
-//                 <option value="work_in_progress">Work in Progress</option>
-//                 <option value="completed">Completed</option>
-//               </select>
-//             </div>
-
-//             {/* Category filter */}
-//             <div>
-//               <label
-//                 className="block text-xs font-medium mb-1"
-//                 style={{ color: themeConfig.textSecondary }}
-//               >
-//                 Category (optional)
-//               </label>
-//               <input
-//                 type="text"
-//                 placeholder="e.g. Electrical, Plumbing, Finishing"
-//                 value={category}
-//                 onChange={(e) => setCategory(e.target.value)}
-//                 className="w-full px-3 py-2 rounded-lg text-sm border"
-//                 style={{
-//                   background: themeConfig.cardBg,
-//                   color: themeConfig.textPrimary,
-//                   borderColor: themeConfig.border,
-//                 }}
-//               />
-//             </div>
-
-//             {/* Date range */}
-//             <div className="grid grid-cols-2 gap-3">
-//               <div>
-//                 <label
-//                   className="block text-xs font-medium mb-1"
-//                   style={{ color: themeConfig.textSecondary }}
-//                 >
-//                   From Date
-//                 </label>
-//                 <input
-//                   type="date"
-//                   value={fromDate}
-//                   onChange={(e) => setFromDate(e.target.value)}
-//                   className="w-full px-3 py-2 rounded-lg text-sm border"
-//                   style={{
-//                     background: themeConfig.cardBg,
-//                     color: themeConfig.textPrimary,
-//                     borderColor: themeConfig.border,
-//                   }}
-//                 />
-//               </div>
-//               <div>
-//                 <label
-//                   className="block text-xs font-medium mb-1"
-//                   style={{ color: themeConfig.textSecondary }}
-//                 >
-//                   To Date
-//                 </label>
-//                 <input
-//                   type="date"
-//                   value={toDate}
-//                   onChange={(e) => setToDate(e.target.value)}
-//                   className="w-full px-3 py-2 rounded-lg text-sm border"
-//                   style={{
-//                     background: themeConfig.cardBg,
-//                     color: themeConfig.textPrimary,
-//                     borderColor: themeConfig.border,
-//                   }}
-//                 />
-//               </div>
-//             </div>
-
-//             {/* Include photos */}
-//             <div className="flex items-center justify-between">
-//               <div>
-//                 <div
-//                   className="text-xs font-medium mb-1"
-//                   style={{ color: themeConfig.textSecondary }}
-//                 >
-//                   Include Photos in Report
-//                 </div>
-//                 <p
-//                   className="text-xs"
-//                   style={{ color: themeConfig.textSecondary }}
-//                 >
-//                   When enabled, report will show maker/checker photos wherever
-//                   available.
-//                 </p>
-//               </div>
-//               <button
-//                 type="button"
-//                 onClick={() => setIncludePhotos((v) => !v)}
-//                 className="relative inline-flex items-center h-6 rounded-full w-11 transition-colors"
-//                 style={{
-//                   background: includePhotos
-//                     ? themeConfig.accent
-//                     : themeConfig.border,
-//                 }}
-//               >
-//                 <span
-//                   className="inline-block w-5 h-5 transform bg-white rounded-full shadow transition-transform"
-//                   style={{
-//                     transform: includePhotos
-//                       ? "translateX(20px)"
-//                       : "translateX(2px)",
-//                   }}
-//                 />
-//               </button>
-//             </div>
-//           </div>
-
-//           {/* Footer */}
-//           <div
-//             className="px-6 py-4 border-t flex items-center justify-end gap-3"
-//             style={{ borderColor: themeConfig.border }}
-//           >
-//             <button
-//               type="button"
-//               onClick={onClose}
-//               className="px-4 py-2 rounded-lg text-sm font-medium"
-//               style={{
-//                 background: themeConfig.textSecondary,
-//                 color: "white",
-//               }}
-//             >
-//               Cancel
-//             </button>
-//             <button
-//               type="submit"
-//               className="px-6 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
-//               style={{
-//                 background: `linear-gradient(135deg, ${themeConfig.accent}, ${themeConfig.accent}dd)`,
-//                 color: "white",
-//                 border: `2px solid ${themeConfig.accent}`,
-//               }}
-//             >
-//               <span>📄</span>
-//               <span>Generate Report</span>
-//             </button>
-//           </div>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// };
 
 
     // Add before return statement
@@ -7679,24 +5762,7 @@ const OverviewFilterModal = ({
   
 )}
 <div className="report-modal-footer">
-  {/* <button
-    type="button"
-    className="btn btn-primary"
-    onClick={onDownloadReport}              // existing detailed report
-    disabled={reportLoading}
-  >
-    {reportLoading ? "Generating..." : "Detailed Report"}
-  </button> */}
-
-  {/* <button
-    type="button"
-    className="btn btn-outline-primary"
-    style={{ marginLeft: "8px", borderColor: "#19376D", color: "#19376D" }}
-    onClick={onOverviewClick}               // new overview handler
-    disabled={overviewLoading}
-  >
-    {overviewLoading ? "Generating..." : "Flat Overview"}
-  </button> */}
+ 
   <button
   type="button"
   className="btn btn-outline-primary"
@@ -7710,42 +5776,7 @@ const OverviewFilterModal = ({
 </div>
 
 
-                {/* {!isMaker && (
-                  <button
-                    onClick={() => {
-                      if (reportData && reportData.pdf_url) {
-                        window.open(reportData.pdf_url, "_blank");
-                      }
-                    }}
-                    disabled={
-                      !reportData || !reportData.pdf_url || reportLoading
-                    }
-                    className={`
-                  px-6 py-3 rounded-xl font-medium transition-all shadow-lg text-sm
-                  ${
-                    reportData && reportData.pdf_url && !reportLoading
-                      ? "text-white cursor-pointer hover:shadow-xl transform hover:-translate-y-0.5"
-                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  }
-                `}
-                    style={{
-                      background: reportData && reportData.pdf_url && !reportLoading ? '#ffbe63' : undefined,
-                      border:
-                        reportData && reportData.pdf_url && !reportLoading
-                          ? "2px solid #ffbe63"
-                          : "2px solid #e5e7eb",
-                    }}
-                    title={
-                      reportError
-                        ? reportError
-                        : !reportData
-                        ? "Report not ready"
-                        : ""
-                    }
-                  >
-                    {reportLoading ? "Loading..." : "📄 Download Report"}
-                  </button>
-                )} */}
+              
 
                 <button
                   onClick={handleBack}
@@ -7831,16 +5862,7 @@ const OverviewFilterModal = ({
                     // const roomKey = roomData.room_id || index;
                     const firstChecklist = roomData.checklists?.[0];
 
-                    // Enhanced room name logic for INITIALIZER
-                    // const roomName =
-                    //   roomDetail?.rooms || // From fetched room details API
-                    //   roomDetail?.name || // Alternative field name
-                    //   firstChecklist?.room_details?.rooms || // From checklist data
-                    //   firstChecklist?.room_details?.name || // Alternative field name in checklist
-                    //   roomData.room_details?.rooms || // From room data
-                    //   roomData.room_details?.name || // Alternative field name in room data
-                    //   `Room ${roomData.room_id}` || // Fallback with ID
-                    //   "Unknown Room"; // Final fallback
+                   
 
                     const allChecklists = roomData.checklists || [];
                     const roomKey = roomData.room_id || index;
@@ -7871,61 +5893,7 @@ const roomName = getRoomDisplayName(roomData);
                 </div>
               )
             ) : ["CHECKER", "MAKER", "SUPERVISOR"].includes(userRole) ? (
-              // Universal Working Roles Tab-based rendering
-              // checklistData.length === 0 ? (
-              //   <div className="text-center py-12">
-              //     <div className="text-6xl mb-4">
-              //       {userRole === "CHECKER"
-              //         ? "🔍"
-              //         : userRole === "MAKER"
-              //         ? "🔨"
-              //         : "👀"}
-              //     </div>
-              //     <h3
-              //       className="text-lg font-semibold mb-2"
-              //       style={{ color: themeConfig.textPrimary }}
-              //     >
-              //       {userRole === "CHECKER" &&
-              //         activeWorkTab === "available-work" &&
-              //         "No Items for Pre-Screening"}
-              //       {userRole === "CHECKER" &&
-              //         activeWorkTab === "my-assignments" &&
-              //         "No Items for Final Review"}
-              //       {userRole === "MAKER" &&
-              //         activeWorkTab === "available-work" &&
-              //         "No New Work Orders"}
-              //       {userRole === "MAKER" &&
-              //         activeWorkTab === "my-assignments" &&
-              //         "No Rework Items"}
-              //       {userRole === "SUPERVISOR" &&
-              //         activeWorkTab === "available-work" &&
-              //         "No Submissions to Review"}
-              //       {userRole === "SUPERVISOR" &&
-              //         activeWorkTab === "my-assignments" &&
-              //         "No Items for Re-Review"}
-              //     </h3>
-              //     <p style={{ color: themeConfig.textSecondary }}>
-              //       {userRole === "CHECKER" &&
-              //         activeWorkTab === "available-work" &&
-              //         "New items will appear here after INITIALIZER assigns them"}
-              //       {userRole === "CHECKER" &&
-              //         activeWorkTab === "my-assignments" &&
-              //         "Items will appear here after SUPERVISOR approves MAKER work"}
-              //       {userRole === "MAKER" &&
-              //         activeWorkTab === "available-work" &&
-              //         "New work will appear here when CHECKER marks items as requiring work"}
-              //       {userRole === "MAKER" &&
-              //         activeWorkTab === "my-assignments" &&
-              //         "Rejected items will appear here for rework"}
-              //       {userRole === "SUPERVISOR" &&
-              //         activeWorkTab === "available-work" &&
-              //         "MAKER submissions will appear here for your review"}
-              //       {userRole === "SUPERVISOR" &&
-              //         activeWorkTab === "my-assignments" &&
-              //         "Previously reviewed items will appear here"}
-              //     </p>
-              //   </div>
-              // ) : (
+             
                checklistData.length === 0 ? (
     noteMessage ? (
       // 🔔 show note instead of the default empty-state block
@@ -9529,21 +7497,7 @@ const roomName = getRoomDisplayName(roomData);
 
         <HistoryModal />
         <ConfirmationDialog />
-        {/* {showReportFilter && (
-          <ReportFilterModal
-            onClose={() => setShowReportFilter(false)}
-            onApply={handleGenerateReport}
-            themeConfig={themeConfig}
-          />
-        )} */}
-        {/* {showReportFilter && (
-  <ReportFilterModal
-    onClose={() => setShowReportFilter(false)}
-  onApply={(filters) => handleGenerateReport(filters)} // ✅ yahi call
-    themeConfig={themeConfig}
-    currentStage={stageInfo?.stage_name || "Current Stage"}
-  />
-)} */}
+       
 {showReportFilter && (
   <ReportFilterModal
     onClose={() => setShowReportFilter(false)}
